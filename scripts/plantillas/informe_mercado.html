@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercado de depósitos y crédito</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f4f2ec; --surface: #fbfaf6; --surface-2: #efede6; --ink: #15191c; --ink-2: #4c524f;
+  --muted: #858a84; --grid: #e3e1d8; --axis: #c4c2b8; --ring: rgba(21, 25, 28, 0.10);
+  --s-bancos: #0a8a7a; --s-coops: #d4622a; --s-foco: #b0197e; --s-cuarto: #6b6fd1; --s-neutro: #a9a79f;
+  --c1: #b0197e; --c2: #d4622a; --c3: #0a8a7a; --c4: #6b6fd1; --c5: #b38600; --c6: #2f78c4;
+  --seq-0: #eaf3f0; --seq-1: #0a5c52; --bueno: #0c7a32; --malo: #b3261e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1214; --surface: #161a1d; --surface-2: #1f2427; --ink: #f3f1ea; --ink-2: #c3c6bf;
+    --muted: #8b908a; --grid: #262b2e; --axis: #3a4044; --ring: rgba(255, 255, 255, 0.10);
+    --s-bancos: #00a79f; --s-coops: #d9682f; --s-foco: #d6449f; --s-cuarto: #7f84e3; --s-neutro: #6d716d;
+    --c1: #d6449f; --c2: #d9682f; --c3: #00a79f; --c4: #7f84e3; --c5: #b08a00; --c6: #3d8fe0;
+    --seq-0: #1d2a29; --seq-1: #3fc2b0; --bueno: #3fbf6a; --malo: #f06a5f;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1214; --surface: #161a1d; --surface-2: #1f2427; --ink: #f3f1ea; --ink-2: #c3c6bf;
+  --muted: #8b908a; --grid: #262b2e; --axis: #3a4044; --ring: rgba(255, 255, 255, 0.10);
+  --s-bancos: #00a79f; --s-coops: #d9682f; --s-foco: #d6449f; --s-cuarto: #7f84e3; --s-neutro: #6d716d;
+  --c1: #d6449f; --c2: #d9682f; --c3: #00a79f; --c4: #7f84e3; --c5: #b08a00; --c6: #3d8fe0;
+  --seq-0: #1d2a29; --seq-1: #3fc2b0; --bueno: #3fbf6a; --malo: #f06a5f;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: inherit; }
+button, select, input { font: inherit; color: inherit; }
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
+.lateral { position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--grid); padding: 22px 14px; background: var(--page); }
+.marca { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); padding: 0 10px 14px; }
+.marca b { display: block; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); margin-top: 4px; font-weight: 650; }
+.capitulos { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.capitulos a { display: flex; gap: 10px; align-items: baseline; text-decoration: none; padding: 7px 10px; border-radius: 8px; color: var(--ink-2); font-size: 13.5px; }
+.capitulos a .n { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; width: 18px; }
+.capitulos a:hover { background: var(--surface-2); color: var(--ink); }
+.capitulos a[aria-current="page"] { background: var(--surface); color: var(--ink); box-shadow: inset 2px 0 0 var(--s-foco); font-weight: 600; }
+.lateral .cortes { font-size: 12px; color: var(--muted); padding: 18px 10px 0; line-height: 1.6; }
+.contenido { padding: 0 32px 80px; max-width: 1520px; width: 100%; }
+@media (max-width: 920px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .lateral { position: sticky; z-index: 6; height: auto; border-right: 0; border-bottom: 1px solid var(--grid); padding: 8px 12px; }
+  .marca, .lateral .cortes { display: none; }
+  .capitulos { display: flex; overflow-x: auto; scrollbar-width: none; }
+  .capitulos a { white-space: nowrap; }
+  .contenido { padding: 0 16px 80px; }
+}
+.pagina { padding-top: 34px; }
+.pagina[hidden] { display: none; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.1; margin: 8px 0 12px; font-weight: 650; letter-spacing: -.01em; }
+h2 { font-size: clamp(22px, 3vw, 30px); line-height: 1.15; margin: 6px 0 10px; font-weight: 650; letter-spacing: -.005em; }
+h3 { font-size: 15px; margin: 0 0 4px; font-weight: 620; }
+.respuesta { font-size: 16.5px; color: var(--ink-2); max-width: 820px; margin: 0 0 20px; }
+.respuesta b { color: var(--ink); font-weight: 620; }
+.bloque { margin-top: 26px; }
+.bloque > h3.titulo-bloque { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.tarjeta { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 18px 18px 14px; min-width: 0; }
+.tarjeta .nota { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+.tarjeta .sub { font-size: 13px; color: var(--ink-2); margin: 0 0 10px; }
+.rejilla { display: grid; gap: 16px; }
+.r2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.r4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* gráfico + tabla: más ancho para la tabla y sin estirar la tarjeta del gráfico al alto de la tabla */
+.gt { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); align-items: start; }
+.r2.arriba { align-items: start; }
+@media (max-width: 1340px) { .gt { grid-template-columns: minmax(0, 1fr); } } /* en pantallas medianas la tabla no cabe al lado: va debajo, a todo el ancho */
+@media (max-width: 860px) { .r2, .gt { grid-template-columns: minmax(0, 1fr); } .r4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dato { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.dato .etq { font-size: 12.5px; color: var(--ink-2); }
+.dato .val { font-size: 26px; font-weight: 620; margin-top: 2px; line-height: 1.15; }
+.dato .sub { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.siguiente { margin-top: 40px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--grid); padding-top: 16px; }
+.siguiente a { text-decoration: none; font-size: 14px; color: var(--ink-2); }
+.siguiente a b { color: var(--ink); }
+.siguiente a:hover b { text-decoration: underline; }
+.filtros { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+.filtro { display: grid; gap: 4px; min-width: 0; }
+.filtro > span { font-size: 11.5px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.filtro select { background: var(--surface); border: 1px solid var(--axis); border-radius: 8px; padding: 5px 8px; font-size: 13.5px; max-width: 240px; }
+.seg { display: inline-flex; gap: 2px; background: var(--surface-2); padding: 3px; border-radius: 999px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; color: var(--ink-2); font-size: 12.5px; padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.10); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--axis); background: var(--surface); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; cursor: pointer; color: var(--ink-2); }
+.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--axis); }
+.chip[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-2); }
+.chip[aria-pressed="true"] i { border-color: transparent; }
+.chip:disabled { opacity: .45; cursor: not-allowed; }
+.rango { display: flex; align-items: center; gap: 10px; }
+.rango input { width: 200px; accent-color: var(--s-foco); }
+.rango output { font-weight: 620; font-variant-numeric: tabular-nums; min-width: 64px; }
+.grafico { position: relative; width: 100%; }
+.grafico svg { display: block; width: 100%; overflow: visible; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); margin: 2px 0 8px; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 16px; height: 2px; border-radius: 2px; display: inline-block; }
+.leyenda i.caja { width: 10px; height: 10px; border-radius: 3px; }
+.leyenda i.punto { width: 10px; height: 10px; border-radius: 50%; }
+.tooltip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--ring); box-shadow: 0 6px 24px rgba(0,0,0,.14);
+  border-radius: 8px; padding: 8px 10px; font-size: 12.5px; min-width: 150px; max-width: 280px; opacity: 0; transition: opacity .08s; z-index: 4; }
+.tooltip .t { color: var(--muted); margin-bottom: 4px; }
+.tooltip .f { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.tooltip .f .k { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tooltip .f .k i { width: 12px; height: 2px; border-radius: 2px; }
+.tooltip .f b { font-weight: 620; font-variant-numeric: tabular-nums; color: var(--ink); }
+.vacio { color: var(--muted); font-size: 13.5px; padding: 30px 0; text-align: center; }
+.tabla-env { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
+th { font-weight: 600; color: var(--ink-2); font-size: 12px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+th.ordenable { cursor: pointer; user-select: none; }
+th.ordenable::after { content: " ↕"; color: var(--muted); font-size: 10px; }
+th[aria-sort="ascending"]::after { content: " ↑"; color: var(--ink); }
+th[aria-sort="descending"]::after { content: " ↓"; color: var(--ink); }
+th[data-def] { text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
+td.largo { white-space: normal; min-width: 240px; max-width: 460px; line-height: 1.4; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr.foco td { background: color-mix(in srgb, var(--s-foco) 9%, transparent); font-weight: 600; }
+.pos { color: var(--bueno); } .neg { color: var(--malo); }
+.portada { padding: 18px 0 8px; }
+.bajada { color: var(--ink-2); max-width: 780px; font-size: 16.5px; margin: 0; }
+.hallazgos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 22px; }
+.hallazgo { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; }
+.hallazgo .n { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hallazgo b { font-size: 15.5px; font-weight: 640; color: var(--ink); line-height: 1.3; }
+.hallazgo p { margin: 0; color: var(--ink-2); font-size: 13.5px; }
+.hallazgo .ir { margin-top: auto; font-size: 12.5px; color: var(--ink); padding-top: 6px; }
+.hallazgo:hover { border-color: var(--axis); }
+.hallazgo:hover .ir { text-decoration: underline; }
+.guia { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 14px 16px; margin: 22px 0 0; }
+.guia dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 8px 0 0; font-size: 13.5px; }
+.guia dt { font-weight: 620; white-space: nowrap; } .guia dd { margin: 0; color: var(--ink-2); }
+@media (max-width: 600px) { .guia dl { grid-template-columns: 1fr; } .guia dd { margin-bottom: 6px; } }
+.accion { display: grid; gap: 12px; }
+.accion article { background: var(--surface); border: 1px solid var(--ring); border-left: 3px solid var(--s-foco); border-radius: 10px; padding: 14px 16px; }
+.accion article p { margin: 0; color: var(--ink-2); }
+details { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 10px 14px; margin-top: 10px; }
+details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.refs li { margin-bottom: 6px; color: var(--ink-2); } .refs i { color: var(--ink); }
+.buscador { width: 100%; max-width: 420px; font-size: 14px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--axis); background: var(--surface); margin: 4px 0 14px; }
+.glosario-grupo { margin-bottom: 16px; }
+.glosario-grupo h3 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 8px; }
+.glosario-grupo td { white-space: normal; vertical-align: top; }
+.glosario-grupo td:first-child { font-weight: 620; width: 22%; } .glosario-grupo td:nth-child(2) { width: 36%; color: var(--ink-2); }
+.boton { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--axis); border-radius: 8px; padding: 6px 12px; text-decoration: none; font-size: 13px; background: var(--surface); margin-top: 8px; }
+.boton:hover { border-color: var(--ink-2); }
+.pie { margin-top: 48px; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="lateral">
+    <div class="marca">Sistema financiero del Ecuador<b>Mercado de depósitos y crédito</b></div>
+    <nav aria-label="Capítulos"><ol class="capitulos" id="capitulos"></ol></nav>
+    <div class="cortes" id="cortes"></div>
+  </aside>
+  <main class="contenido" id="contenido"></main>
+</div>
+
+<script id="datos" type="application/json">__DATOS__</script>
+<script id="glosario-datos" type="application/json">__GLOSARIO__</script>
+<script>
+"use strict";
+/* ================= Datos y utilidades ================= */
+const R = JSON.parse(document.getElementById("datos").textContent);
+const GLOS = JSON.parse(document.getElementById("glosario-datos").textContent);
+const X = R.explorador, ENT = R.entidad, CAT = X.catalogo || {};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, text) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text !== undefined) e.textContent = text; return e; };
+const svgEl = (tag, attrs = {}) => { const e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
+const nf = d => new Intl.NumberFormat("es-EC", { maximumFractionDigits: d, minimumFractionDigits: d });
+const f0 = nf(0), f1 = nf(1), f2 = nf(2), f3 = nf(3);
+const pct = (v, d = 1) => v == null || !isFinite(v) ? "—" : nf(d).format(v * 100) + " %";
+const pp = (v, d = 1) => v == null || !isFinite(v) ? "—" : (v > 0 ? "+" : "") + nf(d).format(v) + " pp";
+
+const usd = v => { if (v == null || !isFinite(v)) return "—"; const a = Math.abs(v), s = v < 0 ? "−" : ""; if (a >= 1e9) return s + "USD " + f1.format(a / 1e9) + " mil M"; if (a >= 1e6) return s + "USD " + f1.format(a / 1e6) + " M"; if (a >= 1e3) return s + "USD " + f0.format(a / 1e3) + " mil"; return s + "USD " + f0.format(a); };
+const titulo = s => String(s ?? "").toLowerCase().replace(/(^|\s|\()\S/g, c => c.toUpperCase());
+const NOMBRES = { "COOP SEGMENTO 1": "Coop. S1", "COOP SEGMENTO 2": "Coop. S2", "COOP SEGMENTO 3": "Coop. S3", "COOP SEGMENTO 4": "Coop. S4", "COOP SEGMENTO 5": "Coop. S5", "COOP SIN SEGMENTO": "Coop. sin seg.",
+  "OTROS BANCOS": "Otros bancos", "GENERAL_RUMINAHUI": "Gral. Rumiñahui", "BANCO PRIVADO": "Bancos privados", "COOPERATIVA": "Cooperativas", "COOPERATIVAS": "Cooperativas",
+  "MUTUALISTA": "Mutualistas", "BANCO PUBLICO": "Banca pública", "SOCIEDAD FINANCIERA": "Soc. financieras", "OTROS": "Mutualistas y públicos" };
+const nom = c => NOMBRES[c] || (CAT[c] && CAT[c].nombre) || titulo(String(c).replace(/_/g, " "));
+const amFecha = am => new Date(Math.floor(am / 100), am % 100, 0);
+const amTxt = am => new Date(Math.floor(am / 100), am % 100 - 1, 1).toLocaleDateString("es-EC", { month: "long", year: "numeric" });
+const mesTxt = d => (d instanceof Date ? d : new Date(d + "T00:00:00")).toLocaleDateString("es-EC", { month: "short", year: "numeric" });
+const fechaTxt = s => s ? new Date(s + "T00:00:00").toLocaleDateString("es-EC", { day: "numeric", month: "short", year: "numeric" }) : "—";
+const filas = c => { if (!c) return []; const ks = Object.keys(c), n = c[ks[0]].length, out = new Array(n); for (let i = 0; i < n; i++) { const o = {}; for (const k of ks) o[k] = c[k][i]; out[i] = o; } return out; };
+const memo = f => { let v; return () => v ?? (v = f()); };
+const unicos = a => [...new Set(a)];
+const mediana = a => { const v = a.filter(x => x != null && isFinite(x)).sort((x, y) => x - y); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null; };
+function mezcla(a, b, t) { const h = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)); const A = h(a), B_ = h(b); return "rgb(" + A.map((v, i) => Math.round(v + (B_[i] - v) * t)).join(",") + ")"; }
+function luminancia(rgb) { const [r, g, b] = rgb.match(/\d+/g).map(Number); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; }
+
+/* Colores: la entidad del plan siempre en magenta; el resto toma el primer color libre al
+   seleccionarse y lo conserva mientras siga seleccionado (el color sigue a la entidad). */
+class Paleta {
+  constructor() { this.asig = new Map(); this.slots = ["--c2", "--c3", "--c4", "--c5", "--c6"]; }
+  color(k) {
+    if (k === ENT) return css("--s-foco");
+    if (!this.asig.has(k)) { const usados = new Set(this.asig.values()); this.asig.set(k, this.slots.find(s => !usados.has(s)) || "--s-neutro"); }
+    return css(this.asig.get(k));
+  }
+  sincronizar(sel) { for (const k of [...this.asig.keys()]) if (!sel.has(k)) this.asig.delete(k); }
+}
+const COLOR_TIPO = { "BANCO PRIVADO": "--s-bancos", "COOPERATIVA": "--s-coops", "MUTUALISTA": "--s-cuarto", "BANCO PUBLICO": "--s-neutro" };
+const COLOR_CLUSTER = ["--c3", "--c2", "--c4", "--c5", "--c6", "--c1"];
+const colorCluster = c => css(COLOR_CLUSTER[(c - 1) % COLOR_CLUSTER.length]);
+
+const DEF = {};
+for (const g of GLOS) for (const t of g.terminos) DEF[t.termino.toLowerCase()] = t;
+const ALIAS = { "α tasa": "semi-elasticidad α", "σ nido": "σ (parámetro de nido)", "f 1.ª etapa": "f de primera etapa", "e.e.": "e.e. (error estándar)",
+  "vida media": "vida media", "ajuste mensual": "ajuste mensual", "traspaso 3 m": "traspaso 3 m", "cartera/dep.": "cartera / depósitos", "roa": "roa", "roe": "roe",
+  "morosidad": "morosidad (mora)", "mora": "morosidad (mora)", "costo fondeo": "costo de fondeo", "gasto op./activo": "gasto operativo / activo",
+  "coop − banco": "diferencial coop − banco (spread)", "avance coop.": "avance de cooperativas (pp)", "a ≤ 1 pp del techo": "techo regulatorio (tasa máxima)", "techo": "techo regulatorio (tasa máxima)",
+  "hhi": "hhi (índice de herfindahl-hirschman)", "cuota": "cuota de mercado", "cuota coop.": "cuota de mercado", "brecha": "brecha de penetración", "potencial": "potencial",
+  "cuota objetivo": "cuota objetivo", "sube: auc sin": "auc", "baja: auc sin": "auc", "auc con": "auc", "efecto en cuota": "disciplina de mercado", "crec. 12 m": "crecimiento 12 m", "crec. dep.": "crecimiento anual compuesto" };
+const definicion = label => { const k = String(label).toLowerCase(); const t = DEF[ALIAS[k] || k]; return t ? t.que_es + " " + t.como_se_lee : null; };
+
+/* ================= Componentes ================= */
+function tarjeta(padre, tituloTxt, subTxt, notaTxt) {
+  const t = el("div", { class: "tarjeta" }), h = el("h3", {}, tituloTxt || "");
+  t.append(h); if (subTxt) t.append(el("p", { class: "sub" }, subTxt));
+  const ley = el("div", { class: "leyenda" }), g = el("div", { class: "grafico" }), nota = el("p", { class: "nota" }, notaTxt || "");
+  t.append(ley, g, nota); padre.append(t);
+  return { t, h, ley, g, nota };
+}
+function filtro(barra, etiqueta, control) { const f = el("label", { class: "filtro" }); f.append(el("span", {}, etiqueta), control); barra.append(f); return f; }
+function barraFiltros(padre) { const b = el("div", { class: "filtros" }); padre.append(b); return b; }
+function segmentado(opciones, valor, alCambiar) {
+  const c = el("div", { class: "seg", role: "group" });
+  const pinta = v => c.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === String(v) ? "true" : "false"));
+  for (const [v, t] of opciones) { const b = el("button", { type: "button", "data-v": v }, t); b.addEventListener("click", () => { pinta(v); alCambiar(v); }); c.append(b); }
+  c.fijar = pinta; pinta(valor); return c;
+}
+function desplegable(opciones, valor, alCambiar) {
+  const s = el("select");
+  s.cargar = (ops, v) => { s.replaceChildren(); for (const [k, t] of ops) { const o = el("option", { value: k }, t); if (String(k) === String(v)) o.selected = true; s.append(o); } };
+  s.cargar(opciones, valor); s.addEventListener("change", () => alCambiar(s.value)); return s;
+}
+function chipsSel(opciones, seleccion, paleta, alCambiar, max = 6) {
+  const c = el("div", { class: "chips" });
+  const pinta = () => {
+    paleta.sincronizar(seleccion);
+    c.querySelectorAll(".chip").forEach(b => { const k = b.dataset.v, on = seleccion.has(k); b.setAttribute("aria-pressed", on ? "true" : "false"); b.querySelector("i").style.background = on ? paleta.color(k) : ""; b.disabled = !on && seleccion.size >= max; });
+  };
+  for (const [k, t] of opciones) {
+    const b = el("button", { type: "button", class: "chip", "data-v": k }); b.append(el("i"), document.createTextNode(t));
+    b.addEventListener("click", () => { if (seleccion.has(k)) { if (seleccion.size > 1) seleccion.delete(k); } else if (seleccion.size < max) seleccion.add(k); pinta(); alCambiar(); });
+    c.append(b);
+  }
+  pinta(); return c;
+}
+function chipsFijos(opciones, seleccion, colorDe, alCambiar) {
+  const c = el("div", { class: "chips" });
+  for (const [k, t] of opciones) {
+    const b = el("button", { type: "button", class: "chip" }), i = el("i"); b.append(i, document.createTextNode(t));
+    const pinta = () => { const on = seleccion.has(k); b.setAttribute("aria-pressed", on ? "true" : "false"); i.style.background = on ? colorDe(k) : ""; };
+    b.addEventListener("click", () => { if (seleccion.has(k) && seleccion.size > 1) seleccion.delete(k); else seleccion.add(k); pinta(); alCambiar(); });
+    pinta(); c.append(b);
+  }
+  return c;
+}
+function deslizador(min, max, paso, valor, fmt, alCambiar) {
+  const c = el("div", { class: "rango" }), i = el("input", { type: "range", min, max, step: paso, value: valor }), o = el("output");
+  i.addEventListener("input", () => { o.textContent = fmt(+i.value); alCambiar(+i.value); }); c.append(i, o); o.textContent = fmt(valor); return c;
+}
+function datos(padre, items) {
+  const r = el("div", { class: "rejilla r4" });
+  for (const [etq, val, sub] of items) { const d = el("div", { class: "dato" }); d.append(el("div", { class: "etq" }, etq), el("div", { class: "val" }, val), el("div", { class: "sub" }, sub || "")); r.append(d); }
+  padre.replaceChildren(r);
+}
+function leyenda(cont, items, forma = "linea") {
+  cont.replaceChildren();
+  for (const it of items) { const s = el("span"), i = el("i", forma === "linea" ? {} : { class: forma }); i.style.background = it.color; s.append(i, document.createTextNode(it.name)); cont.append(s); }
+}
+function tablaEn(padre, tituloTxt, notaTxt) { const t = el("div", { class: "tarjeta" }); if (tituloTxt) t.append(el("h3", {}, tituloTxt)); const env = el("div", { class: "tabla-env" }); t.append(env); if (notaTxt) t.append(el("p", { class: "nota" }, notaTxt)); padre.append(t); return env; }
+function tabla(cont, cols, filasT, opciones = {}) {
+  let orden = opciones.orden || null, dir = opciones.dir || -1;
+  const pintar = () => {
+    let datosT = filasT;
+    if (orden) datosT = [...filasT].sort((a, b) => { const x = a[orden], y = b[orden]; if (x == null) return 1; if (y == null) return -1; return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir; });
+    const t = el("table"), th = el("thead"), tr = el("tr");
+    for (const c of cols) {
+      const h = el("th", { class: (c.n ? "n " : "") + (opciones.ordenable && c.key ? "ordenable" : "") }, c.label), d = definicion(c.label);
+      if (d) { h.setAttribute("data-def", ""); h.title = d; }
+      if (opciones.ordenable && c.key) {
+        if (orden === c.key) h.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
+        h.tabIndex = 0;
+        const ord = () => { if (orden === c.key) dir = -dir; else { orden = c.key; dir = c.n ? -1 : 1; } pintar(); };
+        h.addEventListener("click", ord); h.addEventListener("keydown", e => { if (e.key === "Enter") ord(); });
+      }
+      tr.append(h);
+    }
+    th.append(tr); t.append(th);
+    const tb = el("tbody");
+    for (const f of datosT) {
+      const r = el("tr", opciones.foco && opciones.foco(f) ? { class: "foco" } : {});
+      for (const c of cols) {
+        const v = c.fmt ? c.fmt(f[c.key], f) : f[c.key], td = el("td", c.n ? { class: "n" } : {});
+        td.textContent = v ?? "—";
+        if (!c.n && String(v ?? "").length > 45) td.classList.add("largo"); /* listas de ejemplos: envolver en vez de estirar la tabla */
+        if (c.clase) { const k = c.clase(f[c.key], f); if (k) td.classList.add(k); }
+        r.append(td);
+      }
+      tb.append(r);
+    }
+    t.append(tb); cont.replaceChildren(t);
+  };
+  pintar();
+}
+function tooltip(cont) {
+  const t = el("div", { class: "tooltip", role: "status" });
+  return {
+    node: t,
+    show(x, y, tituloTxt, filasT) {
+      t.replaceChildren(el("div", { class: "t" }, tituloTxt));
+      for (const f of filasT) { const r = el("div", { class: "f" }), k = el("span", { class: "k" }); if (f.color) { const i = el("i"); i.style.background = f.color; k.append(i); } k.append(document.createTextNode(f.name)); r.append(k, el("b", {}, f.value)); t.append(r); }
+      const w = cont.clientWidth, tw = t.offsetWidth; t.style.left = Math.min(Math.max(0, x + 14), Math.max(0, w - tw)) + "px"; t.style.top = Math.max(0, y - 10) + "px"; t.style.opacity = 1;
+    },
+    hide() { t.style.opacity = 0; }
+  };
+}
+/* Dibuja ahora y al cambiar el ancho; con la página oculta (ancho 0) espera a mostrarse. */
+function vigilar(cont, dibujar) {
+  cont._dibujar = dibujar; cont._ancho = -1;
+  cont._redibujar = () => { const w = cont.clientWidth; if (!w) return; cont._ancho = w; cont._dibujar(w); };
+  if (!cont._ro) { cont._ro = new ResizeObserver(() => { const w = cont.clientWidth; if (w && w !== cont._ancho) cont._redibujar(); }); cont._ro.observe(cont); }
+  cont._redibujar();
+}
+function ticksNice(min, max, n = 5) {
+  const span = max - min || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const out = []; for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) out.push(+v.toFixed(10)); return out;
+}
+const vacio = (cont, txt = "Sin datos para este filtro.") => cont.replaceChildren(el("div", { class: "vacio" }, txt));
+
+/* Líneas con cruz y tooltip. series: [{name, color, data: [[Date, valor]], grosor?, discontinua?, sinPunto?}] */
+function lineas(cont, series, o = {}) {
+  vigilar(cont, W => {
+    const H = o.alto || 280, m = { t: o.eventos ? 22 : 12, r: o.etiquetas ? 104 : 16, b: 26, l: 48 };
+    const x0 = o.xMin ? +o.xMin : -Infinity;
+    const todas = series.flatMap(s => s.data.filter(d => d[1] != null && isFinite(d[1]) && +d[0] >= x0));
+    if (!todas.length) return vacio(cont);
+    const xs = todas.map(d => +d[0]), ys = todas.map(d => d[1]);
+    const xa = Math.min(...xs), xb = Math.max(...xs);
+    let y0 = o.yMin ?? Math.min(...ys), y1 = o.yMax ?? Math.max(...ys);
+    if (o.cero) y0 = Math.min(0, y0);
+    const pad = (y1 - y0) * 0.06 || 1; if (o.yMin == null && !(o.cero && y0 === 0)) y0 -= pad; if (o.yMax == null) y1 += pad;
+    const X = v => m.l + (v - xa) / ((xb - xa) || 1) * (W - m.l - m.r), Y = v => m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b);
+    const s = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": o.aria || "gráfico de líneas" });
+    for (const v of ticksNice(y0, y1, 5)) {
+      s.append(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css(v === 0 ? "--axis" : "--grid"), "stroke-width": 1 }));
+      const t = svgEl("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: css("--muted") }); t.textContent = o.fmtY ? o.fmtY(v) : f1.format(v); s.append(t);
+    }
+    const a0 = new Date(xa).getFullYear(), a1 = new Date(xb).getFullYear(), salto = Math.max(1, Math.ceil((a1 - a0 + 1) / Math.max(2, Math.floor(W / 80))));
+    for (let a = a0; a <= a1; a += salto) { const xv = +new Date(a, 0, 1); if (xv < xa) continue; const t = svgEl("text", { x: X(xv), y: H - 6, "text-anchor": "middle", "font-size": 11, fill: css("--muted") }); t.textContent = a; s.append(t); }
+    if (o.eventos) for (const ev of o.eventos) { if (+ev.fecha < xa) continue; s.append(svgEl("rect", { x: X(+ev.fecha) - 1, y: 4, width: 2, height: 10, rx: 1, fill: ev.color })); }
+    const finales = [];
+    for (const se of series) {
+      let d = "", pen = false;
+      for (const [xv, yv] of se.data) { if (yv == null || !isFinite(yv) || +xv < xa) { pen = false; continue; } d += (pen ? "L" : "M") + X(+xv).toFixed(1) + "," + Y(yv).toFixed(1); pen = true; }
+      s.append(svgEl("path", { d, fill: "none", stroke: se.color, "stroke-width": se.grosor || 2, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": se.discontinua ? "5 4" : "none" }));
+      const ult = [...se.data].reverse().find(p => p[1] != null && isFinite(p[1]) && +p[0] >= xa);
+      if (ult && !se.sinPunto) { s.append(svgEl("circle", { cx: X(+ult[0]), cy: Y(ult[1]), r: 4, fill: se.color, stroke: css("--surface"), "stroke-width": 2 })); finales.push({ y: Y(ult[1]), x: X(+ult[0]), se }); }
+    }
+    if (o.etiquetas) { finales.sort((a, b) => a.y - b.y); let prev = -99; for (const f of finales) { if (f.y - prev < 13) continue; const t = svgEl("text", { x: f.x + 8, y: f.y + 4, "font-size": 11.5, fill: css("--ink-2") }); t.textContent = f.se.name.length > 15 ? f.se.name.slice(0, 14) + "…" : f.se.name; s.append(t); prev = f.y; } }
+    const cruz = svgEl("line", { y1: m.t, y2: H - m.b, stroke: css("--axis"), "stroke-width": 1, opacity: 0 }); s.append(cruz);
+    const capa = svgEl("rect", { x: m.l, y: 0, width: Math.max(0, W - m.l - m.r), height: H, fill: "transparent", tabindex: 0 }); s.append(capa);
+    const tt = tooltip(cont); cont.replaceChildren(s, tt.node);
+    const fechas = unicos(xs).sort((a, b) => a - b);
+    const mover = px => {
+      const xv = xa + (px - m.l) / (W - m.l - m.r) * (xb - xa);
+      let best = fechas[0]; for (const f of fechas) if (Math.abs(f - xv) < Math.abs(best - xv)) best = f;
+      cruz.setAttribute("x1", X(best)); cruz.setAttribute("x2", X(best)); cruz.setAttribute("opacity", 1);
+      const fs = series.map(se => { const p = se.data.find(d => +d[0] === best); return { name: se.name, color: se.color, value: p && p[1] != null ? (o.fmtT || o.fmtY || f2.format)(p[1]) : "—" }; });
+      tt.show(X(best), 10, o.fmtFecha ? o.fmtFecha(new Date(best)) : mesTxt(new Date(best)), fs);
+    };
+    capa.addEventListener("pointermove", e => { const r = s.getBoundingClientRect(); mover((e.clientX - r.left) * W / r.width); });
+    capa.addEventListener("pointerleave", () => { tt.hide(); cruz.setAttribute("opacity", 0); });
+    capa.addEventListener("focus", () => mover(W - m.r - 1)); capa.addEventListener("blur", () => { tt.hide(); cruz.setAttribute("opacity", 0); });
+  });
+}
+/* Barras horizontales. filas: [{label, value, color, foco?, marca?, tip?}] */
+function barras(cont, filasB, o = {}) {
+  vigilar(cont, W => {
+    if (!filasB.length) return vacio(cont);
+    const fila = 30, m = { t: 6, r: o.der || 84, b: 6, l: o.izq || 130 }, H = m.t + m.b + filasB.length * fila;
+    const vals = filasB.flatMap(f => [f.value, f.marca ?? 0]), mn = Math.min(0, ...vals), mx = Math.max(0, ...vals, o.ref ?? 0);
+    const X = v => m.l + (v - mn) / ((mx - mn) || 1) * (W - m.l - m.r);
+    const s = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": o.aria || "gráfico de barras" });
+    s.append(svgEl("line", { x1: X(0), x2: X(0), y1: m.t, y2: H - m.b, stroke: css("--axis") }));
+    const tt = tooltip(cont);
+    filasB.forEach((f, i) => {
+      const y = m.t + i * fila, h = Math.min(18, fila - 10), yc = y + fila / 2;
+      const lab = svgEl("text", { x: m.l - 10, y: yc + 4, "text-anchor": "end", "font-size": 12, fill: css(f.foco ? "--ink" : "--ink-2"), "font-weight": f.foco ? 650 : 400 });
+      lab.textContent = f.label.length > 22 ? f.label.slice(0, 21) + "…" : f.label; s.append(lab);
+      const xa = X(Math.min(0, f.value)), xb = X(Math.max(0, f.value)), w = Math.max(1, xb - xa), r = Math.min(4, w / 2), pos = f.value >= 0;
+      const d = pos ? `M${xa},${yc - h / 2}H${xb - r}Q${xb},${yc - h / 2} ${xb},${yc - h / 2 + r}V${yc + h / 2 - r}Q${xb},${yc + h / 2} ${xb - r},${yc + h / 2}H${xa}Z`
+                    : `M${xb},${yc - h / 2}H${xa + r}Q${xa},${yc - h / 2} ${xa},${yc - h / 2 + r}V${yc + h / 2 - r}Q${xa},${yc + h / 2} ${xa + r},${yc + h / 2}H${xb}Z`;
+      const p = svgEl("path", { d, fill: f.color }); s.append(p);
+      const v = svgEl("text", { x: pos ? xb + 6 : xa - 6, y: yc + 4, "text-anchor": pos ? "start" : "end", "font-size": 11.5, fill: css("--ink-2") }); v.textContent = (o.fmt || f2.format)(f.value); s.append(v);
+      if (f.marca != null) s.append(svgEl("line", { x1: X(f.marca), x2: X(f.marca), y1: yc - h / 2 - 3, y2: yc + h / 2 + 3, stroke: css("--ink"), "stroke-width": 2 }));
+      const hit = svgEl("rect", { x: 0, y, width: W, height: fila, fill: "transparent", tabindex: 0 });
+      const mostrar = () => { p.setAttribute("opacity", .8); tt.show(Math.min(xb, W - 220), y + fila, f.label, f.tip || [{ name: o.nombre || "valor", value: (o.fmt || f2.format)(f.value), color: f.color }]); };
+      const ocultar = () => { p.setAttribute("opacity", 1); tt.hide(); };
+      hit.addEventListener("pointerenter", mostrar); hit.addEventListener("pointerleave", ocultar); hit.addEventListener("focus", mostrar); hit.addEventListener("blur", ocultar);
+      s.append(hit);
+    });
+    if (o.ref != null) s.append(svgEl("line", { x1: X(o.ref), x2: X(o.ref), y1: m.t, y2: H - m.b, stroke: css("--ink-2"), "stroke-width": 1.5 }));
+    cont.replaceChildren(s, tt.node);
+  });
+}
+/* Dispersión. puntos: [{x, y, size?, color, label, foco?, tip}] */
+function dispersion(cont, puntos, o = {}) {
+  vigilar(cont, W => {
+    const ok = puntos.filter(p => p.x != null && p.y != null && isFinite(p.x) && isFinite(p.y));
+    if (!ok.length) return vacio(cont);
+    const H = o.alto || 380, m = { t: 18, r: 24, b: 40, l: 56 };
+    let x0 = Math.min(...ok.map(p => p.x)), x1 = Math.max(...ok.map(p => p.x)), y0 = Math.min(...ok.map(p => p.y)), y1 = Math.max(...ok.map(p => p.y));
+    const px = (x1 - x0) * .06 || 1, py = (y1 - y0) * .08 || 1; x0 -= px; x1 += px; y0 -= py; y1 += py;
+    const X = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r), Y = v => m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b);
+    const smax = Math.max(...ok.map(p => p.size || 1)), rad = p => o.tamano ? 4 + 14 * Math.sqrt((p.size || 0) / smax) : 5;
+    const s = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": o.aria || "gráfico de dispersión" });
+    for (const v of ticksNice(y0, y1, 5)) { s.append(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css(v === 0 ? "--axis" : "--grid") })); const t = svgEl("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: css("--muted") }); t.textContent = (o.fmtY || f1.format)(v); s.append(t); }
+    for (const v of ticksNice(x0, x1, Math.max(3, Math.floor(W / 110)))) { s.append(svgEl("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: css(v === 0 ? "--axis" : "--grid") })); const t = svgEl("text", { x: X(v), y: H - m.b + 16, "text-anchor": "middle", "font-size": 11, fill: css("--muted") }); t.textContent = (o.fmtX || f1.format)(v); s.append(t); }
+    const tx = svgEl("text", { x: W - m.r, y: H - 4, "text-anchor": "end", "font-size": 11.5, fill: css("--ink-2") }); tx.textContent = o.etqX ? o.etqX + " →" : ""; s.append(tx);
+    const ty = svgEl("text", { x: m.l, y: m.t - 6, "font-size": 11.5, fill: css("--ink-2") }); ty.textContent = o.etqY ? "↑ " + o.etqY : ""; s.append(ty);
+    for (const p of [...ok].sort((a, b) => (b.size || 0) - (a.size || 0) || (a.foco ? 1 : 0) - (b.foco ? 1 : 0))) {
+      const c = svgEl("circle", { cx: X(p.x), cy: Y(p.y), r: rad(p), fill: p.color, "fill-opacity": p.foco ? .95 : .6, stroke: css(p.foco ? "--ink" : "--surface"), "stroke-width": p.foco ? 2 : 1.5 });
+      s.append(c); p._c = c;
+    }
+    for (const p of ok.filter(q => q.foco)) { const t = svgEl("text", { x: X(p.x) + rad(p) + 4, y: Y(p.y) + 4, "font-size": 11.5, "font-weight": 620, fill: css("--ink") }); t.textContent = p.label; s.append(t); }
+    const capa = svgEl("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent", tabindex: 0 }); s.append(capa);
+    const tt = tooltip(cont); cont.replaceChildren(s, tt.node);
+    let actual = null;
+    const soltar = () => { if (actual) actual._c.setAttribute("stroke", css(actual.foco ? "--ink" : "--surface")); actual = null; };
+    const mover = (mx, my) => {
+      let best = null, bd = 1e9; for (const p of ok) { const d = Math.hypot(X(p.x) - mx, Y(p.y) - my) - rad(p); if (d < bd) { bd = d; best = p; } }
+      if (actual !== best) soltar();
+      if (best && bd < 24) { actual = best; best._c.setAttribute("stroke", css("--ink")); tt.show(X(best.x), Y(best.y) + 8, best.label, best.tip); } else { tt.hide(); }
+    };
+    capa.addEventListener("pointermove", e => { const r = s.getBoundingClientRect(); mover((e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height); });
+    capa.addEventListener("pointerleave", () => { tt.hide(); soltar(); });
+    capa.addEventListener("focus", () => { const f = ok.find(p => p.foco) || ok[0]; mover(X(f.x), Y(f.y)); });
+    capa.addEventListener("blur", () => { tt.hide(); soltar(); });
+  });
+}
+/* Matriz de calor (fila mueve → columna sigue). */
+function matriz(cont, grupos, valores, extraFila, sel) {
+  vigilar(cont, W0 => {
+    const izq = 104, arriba = 76, n = grupos.length, W = Math.max(W0, izq + n * 30 + 40);
+    const c = Math.max(30, Math.min(56, (W - izq - 40) / n)), H = arriba + (n + 1) * c + 6;
+    const s = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "matriz de respuesta" }); s.style.width = W + "px"; s.style.maxWidth = "none";
+    const tt = tooltip(cont);
+    grupos.forEach((g, j) => { const t = svgEl("text", { transform: `translate(${izq + j * c + c / 2},${arriba - 8}) rotate(-45)`, "font-size": 11, fill: css(g === sel ? "--ink" : "--ink-2"), "font-weight": g === sel ? 650 : 400 }); t.textContent = nom(g); s.append(t); });
+    const fl = [...grupos.map((g, i) => ({ g, vals: valores[i] })), { g: "_base", vals: extraFila }];
+    fl.forEach((f, i) => {
+      const y = arriba + i * c + (f.g === "_base" ? 6 : 0);
+      const t = svgEl("text", { x: izq - 8, y: y + c / 2 + 4, "text-anchor": "end", "font-size": 11.5, fill: css(f.g === sel ? "--ink" : "--ink-2"), "font-weight": f.g === sel ? 650 : 400 }); t.textContent = f.g === "_base" ? "Prob. base" : nom(f.g); s.append(t);
+      f.vals.forEach((v, j) => {
+        if (v == null) return;
+        const col = mezcla(css("--seq-0"), css("--seq-1"), Math.min(1, v / 0.9)), enfoque = f.g === sel || grupos[j] === sel || f.g === "_base";
+        const r = svgEl("rect", { x: izq + j * c + 1, y: y + 1, width: c - 2, height: c - 2, rx: 3, fill: col, opacity: enfoque ? 1 : .35, tabindex: 0 }); s.append(r);
+        if (c >= 34) { const tx = svgEl("text", { x: izq + j * c + c / 2, y: y + c / 2 + 4, "text-anchor": "middle", "font-size": 11, fill: luminancia(col) > .55 ? "#15191c" : "#ffffff", "pointer-events": "none", opacity: enfoque ? 1 : .5 }); tx.textContent = f0.format(v * 100); s.append(tx); }
+        const mostrar = () => tt.show(izq + j * c, y + c, f.g === "_base" ? nom(grupos[j]) : `${nom(f.g)} mueve → ${nom(grupos[j])}`, [{ name: f.g === "_base" ? "probabilidad base" : "lo sigue", value: pct(v, 0) }]);
+        r.addEventListener("pointerenter", mostrar); r.addEventListener("focus", mostrar); r.addEventListener("pointerleave", () => tt.hide()); r.addEventListener("blur", () => tt.hide());
+      });
+    });
+    cont.style.overflowX = "auto"; cont.replaceChildren(s, tt.node);
+  });
+}
+/* Línea de tiempo del ciclo de tasas. */
+function lineaTiempo(cont, filasC, sel) {
+  vigilar(cont, W => {
+    const fila = 28, m = { t: 22, r: 16, b: 8, l: 110 }, H = m.t + m.b + filasC.length * fila;
+    const d0 = +new Date("2021-06-01"), d1 = +new Date(R.cortes.tasas_semana + "T00:00:00");
+    const X = v => m.l + (v - d0) / (d1 - d0) * (W - m.l - m.r), F = s => +new Date(s + "T00:00:00");
+    const s = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "línea de tiempo del ciclo de tasas" });
+    for (let a = 2022; a <= new Date(d1).getFullYear(); a++) { const xv = X(+new Date(a, 0, 1)); s.append(svgEl("line", { x1: xv, x2: xv, y1: m.t - 6, y2: H - m.b, stroke: css("--grid") })); const t = svgEl("text", { x: xv, y: 12, "text-anchor": "middle", "font-size": 11, fill: css("--muted") }); t.textContent = a; s.append(t); }
+    const tt = tooltip(cont);
+    filasC.forEach((f, i) => {
+      const y = m.t + i * fila + fila / 2, foco = f.grupo === sel;
+      const t = svgEl("text", { x: m.l - 10, y: y + 4, "text-anchor": "end", "font-size": 12, fill: css(foco ? "--ink" : "--ink-2"), "font-weight": foco ? 650 : 400 }); t.textContent = nom(f.grupo); s.append(t);
+      const color = foco ? css("--s-foco") : f.grupo.startsWith("COOP") ? css("--s-coops") : css("--s-bancos");
+      const xp = X(F(f.pico)), xb = f.baja_desde ? X(F(f.baja_desde)) : X(d1);
+      if (f.sube_desde) { const xs = X(F(f.sube_desde)); s.append(svgEl("rect", { x: xs, y: y - 5, width: Math.max(2, xp - xs), height: 10, rx: 4, fill: color, opacity: .9 })); s.append(svgEl("rect", { x: xp, y: y - 5, width: Math.max(2, xb - xp), height: 10, rx: 4, fill: color, opacity: .3 })); }
+      else s.append(svgEl("rect", { x: X(d0), y: y - 1, width: X(d1) - X(d0), height: 2, fill: css("--axis") }));
+      s.append(svgEl("circle", { cx: xp, cy: y, r: 5, fill: css("--surface"), stroke: color, "stroke-width": 2 }));
+      const hit = svgEl("rect", { x: 0, y: y - fila / 2, width: W, height: fila, fill: "transparent", tabindex: 0 });
+      const mostrar = () => tt.show(Math.min(xp, W - 230), y + 10, nom(f.grupo), [{ name: "sube desde", value: f.sube_desde ? fechaTxt(f.sube_desde) : "no subió 1 pp" }, { name: "pico", value: fechaTxt(f.pico) + " · " + f2.format(f.tasa_pico) + " %" }, { name: "subida", value: pp(f.subida_pp) }, { name: "baja desde", value: fechaTxt(f.baja_desde) }, { name: "tasa actual", value: f2.format(f.tasa_actual) + " %" }]);
+      hit.addEventListener("pointerenter", mostrar); hit.addEventListener("pointerleave", () => tt.hide()); hit.addEventListener("focus", mostrar); hit.addEventListener("blur", () => tt.hide());
+      s.append(hit);
+    });
+    cont.replaceChildren(s, tt.node);
+  });
+}
+
+/* ================= Datos derivados ================= */
+const SP = memo(() => filas(X.saldos_provincia));
+const EM = memo(() => filas(X.entidades_mes));
+const TP = memo(() => filas(X.tasas_pasivas).map(d => ({ ...d, fecha: new Date(d.mes + "-01T00:00:00") })));
+const TA = memo(() => filas(X.tasas_activas));
+const TECHO = memo(() => filas(X.techos));
+const OOS = memo(() => filas(X.predicciones_oos).map(d => ({ ...d, f: new Date(d.fecha + "T00:00:00") })));
+const TRAY = memo(() => filas(X.trayectorias));
+const ENTS = () => R.clusters_entidad.entidades;
+const ultimoAM = Math.max(...X.saldos_provincia.anio_mes);
+const sust = R.sustitucion, acc = R.accion, dem = R.demanda;
+const alphaDep = dem.modelos["DEP_PLAZO|logit simple"].coeficientes.tasa;
+const GRANDES = ["PICHINCHA", "GUAYAQUIL", "PACIFICO", "PRODUBANCO", "BOLIVARIANO", "INTERNACIONAL"];
+const tasasM = R.tasas_mensuales.map(d => ({ ...d, fecha: new Date(d.mes + "T00:00:00") }));
+const bancosProm = d => GRANDES.reduce((s, k) => s + d[k], 0) / GRANDES.length;
+const pico = tasasM.filter(d => d.mes >= "2023-06-01").reduce((a, d) => bancosProm(d) > bancosProm(a) ? d : a);
+const piso = tasasM.filter(d => d.mes >= "2021-06-01" && d.mes <= "2022-06-30").reduce((a, d) => bancosProm(d) < bancosProm(a) ? d : a);
+const ultTasa = tasasM[tasasM.length - 1];
+const lideres = Object.entries(R.indice_liderazgo).filter(([k]) => !k.startsWith("COOP") && k !== "OTROS BANCOS");
+const d1disc = dem.disciplina["rezago1|por_nido"];
+/* Señal de hoy: la dirección (sube / baja) cuya probabilidad media más supera a su frecuencia
+   histórica, y los dos bancos con mayor probabilidad en esa dirección (sin la entidad del plan). */
+function senalHoy() {
+  const PR = R.anticipacion.prediccion, fS = R.anticipacion.evaluacion.sube.at(-1).frecuencia, fB = R.anticipacion.evaluacion.baja.at(-1).frecuencia;
+  const media = k => PR.reduce((a, x) => a + x[k], 0) / PR.length;
+  const dir = media("p_sube") / fS >= media("p_baja") / fB ? "sube" : "baja", k = "p_" + dir;
+  const top = [...PR].filter(x => x.banco !== ENT).sort((a, b) => b[k] - a[k]).slice(0, 2);
+  return { dir, k, top, propia: PR.find(x => x.banco === ENT), texto: top.map(x => nom(x.banco) + " (" + pct(x[k], 0) + ")").join(" y "), sustantivo: dir === "sube" ? "subida" : "recorte" };
+}
+const ent = nom(ENT);
+const REGIONES = [["", "Todas"], ["COSTA", "Costa"], ["SIERRA", "Sierra"], ["ORIENTE", "Amazonía"], ["INSULAR", "Galápagos"]];
+const sig = (a, se) => Math.abs(a / se) > 2.58 ? "***" : Math.abs(a / se) > 1.96 ? "**" : Math.abs(a / se) > 1.64 ? "*" : "";
+const PERIODOS = [["2015", "Desde 2015"], ["2019", "2019"], ["2022", "2022"], ["24m", "24 meses"]];
+const desdePeriodo = p => { if (p !== "24m") return new Date(+p, 0, 1); const f = new Date(R.cortes.tasas_semana + "T00:00:00"); return new Date(f.getFullYear() - 2, f.getMonth(), 1); };
+const NOMBRE_CLUS = c => { const CP = R.clusters_canton.perfil, p = CP.find(d => d.cluster === c); if (!p) return "Grupo " + c; const maxDep = Math.max(...CP.map(d => d.depositos));
+  if (p.depositos === maxDep) return "Plazas grandes y diversificadas"; if (p.cartera_depositos > 1.8) return "Pequeños con crédito mayor al ahorro"; if (p.cuota_coop > 0.7 && p.peso_micro > 0.5) return "Rurales cooperativos de microcrédito"; if (p.cuota_coop > 0.7) return "Mercados cooperativos"; return "Medianos con presencia bancaria"; };
+const NOMBRE_SEG = c => { const p = R.clusters_entidad.perfil.find(d => d.cluster === c); if (!p) return "Grupo " + c; if (p.peso_vivienda > .5) return "Especialistas en vivienda"; if (p.peso_productivo > .4 && p.cantones_hhi > .6) return "Banca de nicho, geográficamente concentrada"; if (p.peso_productivo > .4) return "Banca universal / comercial"; if (p.gasto_operativo_activo > .06) return "Consumo y micro de alto margen"; return "Consumo y microcrédito minorista"; };
+
+/* ================= Páginas ================= */
+const PAGINAS = [
+  { id: "inicio", t: "Inicio", n: "00" },
+  { id: "mercado", t: "Saldos y cuotas", n: "01", q: "¿Cómo se mueven los saldos y quién gana mercado?" },
+  { id: "tasas", t: "Tasas", n: "02", q: "¿Cómo se mueven las tasas de cada entidad?" },
+  { id: "sustitucion", t: "Bancos ↔ cooperativas", n: "03", q: "¿Cuánto dinero pasa de los bancos a las cooperativas cuando cambia el diferencial de tasas?" },
+  { id: "liderazgo", t: "Liderazgo", n: "04", q: "¿Quién mueve primero las tasas y quién sigue?" },
+  { id: "anticipar", t: "Anticipar", n: "05", q: "¿Se puede anticipar el próximo movimiento de un competidor?" },
+  { id: "demanda", t: "Elasticidades", n: "06", q: "¿Cuánto mueve la tasa (y la mora) la cuota de cada entidad?" },
+  { id: "simulador", t: "Simulador", n: "07", q: "¿Qué pasa si una entidad mueve su tasa?" },
+  { id: "cantones", t: "Cantones", n: "08", q: "¿En qué cantones hay oportunidad?" },
+  { id: "segmentos", t: "Modelos de negocio", n: "09", q: "¿Con quién compararse y cómo evolucionan?" },
+  { id: "accion", t: "Plan de acción", n: "10", q: `¿Qué debería hacer Banco ${nom(ENT)}?` },
+  { id: "metodo", t: "Método", n: "11", q: "Datos, supuestos y límites" },
+  { id: "glosario", t: "Glosario", n: "12", q: "Qué significa cada término y cómo se lee" },
+];
+const RENDER = {}, pintada = {};
+const pag = id => PAGINAS.find(p => p.id === id);
+/* La respuesta corta mezcla texto y cifras destacadas: partes = ["texto", ["cifra"], "texto"...] */
+function cabecera(sec, p, partes) {
+  sec.append(el("div", { class: "eyebrow" }, `Capítulo ${p.n} · ${p.t}`), el("h2", {}, p.q));
+  if (partes) { const r = el("p", { class: "respuesta" }); for (const x of partes) r.append(Array.isArray(x) ? el("b", {}, x[0]) : document.createTextNode(x)); sec.append(r); }
+}
+function pie(sec, p) {
+  const i = PAGINAS.indexOf(p), ant = PAGINAS[i - 1], sg = PAGINAS[i + 1], d = el("div", { class: "siguiente" });
+  const a1 = el("a", { href: "#/" + (ant ? ant.id : "inicio") }); if (ant) a1.append(document.createTextNode("← "), el("b", {}, ant.t)); d.append(a1);
+  const a2 = el("a", { href: "#/" + (sg ? sg.id : "inicio") }); if (sg) a2.append(document.createTextNode("Siguiente: "), el("b", {}, sg.t), document.createTextNode(" →")); d.append(a2);
+  sec.append(d);
+}
+function bloque(sec, tituloTxt) { const b = el("div", { class: "bloque" }); if (tituloTxt) b.append(el("h3", { class: "titulo-bloque" }, tituloTxt)); sec.append(b); return b; }
+
+/* ---------- 00 Inicio ---------- */
+RENDER.inicio = sec => {
+  const port = el("div", { class: "portada" });
+  port.append(el("div", { class: "eyebrow" }, "Sistema financiero del Ecuador · análisis de mercado"),
+    el("h1", {}, "Captaciones y colocaciones: quién se lleva el dinero y cómo reacciona a las tasas"),
+    el("p", { class: "bajada" }, `Un recorrido en capítulos: cómo se mueven los saldos, cómo se fijan y se siguen las tasas, cuánto dinero migra entre bancos y cooperativas, dónde hay oportunidad y qué debería hacer Banco ${ent}. Cada capítulo responde una pregunta y deja explorar los datos con filtros.`));
+  sec.append(port);
+  const sim25 = acc.simulacion.escenarios["25"], ceE = R.correccion_error.find(d => d.grupo === ENT);
+  const evalS = R.anticipacion.evaluacion.sube.at(-1).auc, evalB = R.anticipacion.evaluacion.baja.at(-1).auc;
+  const techoCons = R.techos.find(d => d.segmento === "CONSUMO" && d.tipo_entidad === "BANCO PRIVADO");
+  const topOpp = acc.oportunidades.depositos.top.filter(d => d.brecha_pp >= 2).slice(0, 4).map(d => titulo(d.canton)).join(", ");
+  const H = [
+    ["sustitucion", "El dinero sigue al diferencial de tasas, con rezago", `Cada punto de diferencial a favor de las cooperativas S1 les lleva ${f1.format(sust.flujos.pp_cuota_por_pp_spread)} pp de las captaciones nuevas a plazo; en saldos, ${usd(sust.saldos.usd_largo_plazo_por_pp_spread)} en el largo plazo.`],
+    ["tasas", "Los bancos compiten en tasa; las cooperativas casi no la mueven", `La tasa a plazo de los bancos grandes subió ${f1.format(bancosProm(pico) - bancosProm(piso))} pp entre ${mesTxt(piso.fecha)} y ${mesTxt(pico.fecha)}; la de cooperativas S1, ${f1.format(pico["COOP SEGMENTO 1"] - piso["COOP SEGMENTO 1"])} pp.`],
+    ["liderazgo", `${nom(lideres[0][0])} y ${nom(lideres[1][0])} marcan el paso`, `Cuando mueven primero, el resto de bancos grandes los sigue en 0–2 meses en ≈ 2 de cada 3 casos. ${ent} cierra la mitad de una brecha con sus pares en ${f1.format(ceE.vida_media)} meses.`],
+    ["anticipar", "Los movimientos se pueden anticipar, con modestia", `AUC fuera de muestra de ${f2.format(evalS)} (subidas) y ${f2.format(evalB)} (bajadas) a 4 semanas. La liquidez del banco agrega una señal pequeña.`],
+    ["demanda", "La tasa mueve poco la cuota; la mora sí castiga", `Semi-elasticidad ${f2.format(alphaDep)} por punto. Un punto de mora le quita a un banco ≈ ${f1.format(-d1disc.coeficientes.morosidad_bancos * 100)} % de su captación nueva (≈ ${f2.format(acc.mora_equivalente_pp)} pp de tasa). En crédito, ${pct(techoCons.cuota_a_1pp_del_techo, 0)} del consumo bancario está pegado al techo.`],
+    ["simulador", `Para ${ent}, subir tasa en todo el país es caro`, `+0,25 pp de tasa atraen ≈ ${usd(sim25.gana_mensual_usd)} al mes pero re-precian ${usd(acc.simulacion.saldo_plazo_actual)}: el fondeo nuevo cuesta ≈ ${f0.format(sim25.costo_marginal_pct)} % anual.`],
+    ["cantones", `Donde ${ent} rinde por debajo de sí mismo`, `${topOpp}: potencial ≈ ${usd(acc.oportunidades.depositos.total_usd)} en depósitos y ${usd(acc.oportunidades.cartera.total_usd)} en cartera.`],
+  ];
+  const g = el("div", { class: "hallazgos" });
+  H.forEach(([id, t, p], i) => { const a = el("a", { class: "hallazgo", href: "#/" + id }), P = pag(id); a.append(el("span", { class: "n" }, String(i + 1).padStart(2, "0")), el("b", {}, t), el("p", {}, p), el("span", { class: "ir" }, `Capítulo ${P.n} · ${P.t} →`)); g.append(a); });
+  sec.append(g);
+  const guia = el("div", { class: "guia" }), dl = el("dl"); guia.append(el("h3", {}, "Cómo leer las cifras"));
+  for (const [k, v] of [["pp", "Puntos porcentuales: diferencia entre porcentajes. Una tasa que pasa de 4,50 % a 4,75 % subió 0,25 pp. Todos los cambios de tasa del informe están en pp."], ["%", "Cambio relativo. “La cuota sube 9 %” con cuota de 10 % = pasa a ≈ 10,9 %."], ["Saldo / flujo", "Saldo: lo que hay a fin de mes. Flujo: lo que entra en el período (captaciones nuevas, incluidas renovaciones). El flujo reacciona primero; el saldo, con meses de rezago."], ["Tasas", "Efectivas anuales, ponderadas por monto. Las de depósitos a plazo están corregidas por la mezcla de plazos."], ["Encabezados subrayados", "Pasa el cursor para ver qué miden. Todo está en el capítulo Glosario."]]) dl.append(el("dt", {}, k), el("dd", {}, v));
+  guia.append(dl); sec.append(guia);
+};
+
+/* ---------- 01 Mercado ---------- */
+RENDER.mercado = sec => {
+  const crec3 = (t, c) => { const v = a => SP().filter(d => d.tipo_entidad === t && d.anio_mes === a).reduce((s, d) => s + d[c], 0); return Math.pow(v(ultimoAM) / v(ultimoAM - 300), 1 / 3) - 1; };
+  cabecera(sec, pag("mercado"), ["En tres años la cartera de los bancos privados creció ", [pct(crec3("BANCO PRIVADO", "cartera")) + " anual"], ` contra ${pct(crec3("COOPERATIVA", "cartera"))} de las cooperativas; en depósitos, ${pct(crec3("BANCO PRIVADO", "depositos"))} contra ${pct(crec3("COOPERATIVA", "depositos"))}. La banca pública pierde peso. Filtra por región o provincia para ver dónde cambia la historia.`]);
+  const MED = [["depositos", "Depósitos"], ["dep_plazo", "A plazo"], ["dep_vista", "A la vista"], ["cartera", "Cartera"], ["mora", "Morosidad"]];
+  const st = { medida: "depositos", vista: "monto", region: "", provincia: "" };
+  const barra = barraFiltros(sec);
+  filtro(barra, "Medida", segmentado(MED, st.medida, v => { st.medida = v; pintar(); }));
+  filtro(barra, "Mostrar", segmentado([["monto", "Monto"], ["cuota", "Participación"], ["crec", "Crecimiento anual"]], st.vista, v => { st.vista = v; pintar(); }));
+  const provs = () => [["", "Todas"], ...unicos(SP().filter(d => !st.region || d.region === st.region).map(d => d.provincia)).sort().map(x => [x, titulo(x)])];
+  const selProv = desplegable(provs(), "", v => { st.provincia = v; pintar(); });
+  filtro(barra, "Región", desplegable(REGIONES, "", v => { st.region = v; st.provincia = ""; selProv.cargar(provs(), ""); pintar(); }));
+  filtro(barra, "Provincia", selProv);
+  const resumen = el("div"); sec.append(resumen);
+  const c1 = tarjeta(bloque(sec, "Por tipo de entidad"), "", "", "Fuente: CAPCOL (Superbancos) y SEPS, saldos a fin de mes. Mutualistas incluyen cartera vendida al fideicomiso. Morosidad = cartera improductiva / cartera.");
+  const b2 = bloque(sec, "Comparar entidades (nacional)");
+  const selE = new Set([ENT, "PICHINCHA", "PACIFICO", "PRODUBANCO"]), palE = new Paleta(), stE = { vista: "cuota" };
+  const ordT = { "BANCO PRIVADO": 0, "MUTUALISTA": 1, "BANCO PUBLICO": 2, "COOPERATIVA": 3 };
+  const opcionesE = unicos(EM().map(d => d.entidad_codigo)).map(k => [k, nom(k)]).sort((a, b) => (ordT[CAT[a[0]]?.tipo] ?? 9) - (ordT[CAT[b[0]]?.tipo] ?? 9) || a[1].localeCompare(b[1]));
+  const barraE = barraFiltros(b2);
+  filtro(barraE, "Mostrar", segmentado([["monto", "Monto"], ["cuota", "Cuota del sistema"], ["crec", "Crecimiento anual"]], stE.vista, v => { stE.vista = v; pintarE(); }));
+  filtro(barraE, "Entidades (hasta 6)", chipsSel(opcionesE, selE, palE, () => pintarE()));
+  const c2 = tarjeta(b2, "", "", "Cuota del sistema = saldo de la entidad / total de bancos privados, cooperativas, mutualistas y banca pública. Las cooperativas listadas son las 15 con más depósitos. Datos por entidad nacionales: el filtro de provincia no aplica aquí.");
+  const env3 = tablaEn(bloque(sec, "Ranking al último corte"), "", "Ordena con clic en los encabezados. Cambio y crecimiento contra el mismo mes del año anterior.");
+  const valor = (d, med) => med === "mora" ? (d.cartera ? d.cartera_improductiva / d.cartera : null) : d[med];
+  const CAMPOS = ["cartera", "cartera_improductiva", "depositos", "dep_plazo", "dep_vista"];
+  function serieTipo() {
+    const agg = {};
+    for (const d of SP()) { if ((st.region && d.region !== st.region) || (st.provincia && d.provincia !== st.provincia)) continue; const k = d.tipo_entidad + "|" + d.anio_mes; const a = agg[k] || (agg[k] = { t: d.tipo_entidad, am: d.anio_mes, cartera: 0, cartera_improductiva: 0, depositos: 0, dep_plazo: 0, dep_vista: 0 }); for (const c of CAMPOS) a[c] += d[c] || 0; }
+    return Object.values(agg);
+  }
+  function pintar() {
+    const ag = serieTipo(), mora = st.medida === "mora", vista = mora ? "monto" : st.vista;
+    const tot = new Map(); for (const a of ag) tot.set(a.am, (tot.get(a.am) || 0) + (a[mora ? "cartera" : st.medida] || 0));
+    const series = ["BANCO PRIVADO", "COOPERATIVA", "MUTUALISTA", "BANCO PUBLICO"].map(t => {
+      const pts = ag.filter(a => a.t === t).sort((a, b) => a.am - b.am), byAm = new Map(pts.map(a => [a.am, valor(a, st.medida)]));
+      return { name: nom(t), color: css(COLOR_TIPO[t]), data: pts.map(a => { const v = valor(a, st.medida); let y; if (mora) y = v * 100; else if (vista === "monto") y = v / 1e9; else if (vista === "cuota") y = v / tot.get(a.am) * 100; else { const b = byAm.get(a.am - 100); y = b ? (v / b - 1) * 100 : null; } return [amFecha(a.am), y]; }) };
+    });
+    const lugar = st.provincia ? titulo(st.provincia) : st.region ? REGIONES.find(r => r[0] === st.region)[1] : "Ecuador";
+    c1.h.textContent = `${MED.find(m => m[0] === st.medida)[1]} · ${lugar} · ${mora ? "% de la cartera" : vista === "monto" ? "miles de millones de USD" : vista === "cuota" ? "participación %" : "variación anual %"}`;
+    leyenda(c1.ley, series);
+    lineas(c1.g, series, { cero: vista === "monto" && !mora, fmtY: v => f0.format(v) + (vista === "monto" && !mora ? "" : " %"), fmtT: v => f1.format(v) + (vista === "monto" && !mora ? " mil M" : " %"), etiquetas: true, alto: 300 });
+    const ult = ag.filter(a => a.am === ultimoAM), totU = ult.reduce((s, a) => s + (a[mora ? "cartera" : st.medida] || 0), 0);
+    const banc = ult.find(a => a.t === "BANCO PRIVADO"), coop = ult.find(a => a.t === "COOPERATIVA");
+    const yoy = t => { const a = ag.find(x => x.t === t && x.am === ultimoAM), b = ag.find(x => x.t === t && x.am === ultimoAM - 100), k = mora ? "cartera" : st.medida; return a && b && b[k] ? a[k] / b[k] - 1 : null; };
+    datos(resumen, mora ? [["Morosidad bancos privados", pct(banc && valor(banc, "mora")), lugar + " · " + amTxt(ultimoAM)], ["Morosidad cooperativas", pct(coop && valor(coop, "mora")), lugar], ["Cartera del filtro", usd(totU), ""], ["Cuota coop. en cartera", pct(coop && totU ? coop.cartera / totU : null), ""]]
+      : [["Total del filtro", usd(totU), lugar + " · " + amTxt(ultimoAM)], ["Cuota bancos privados", pct(banc ? banc[st.medida] / totU : null), ""], ["Cuota cooperativas", pct(coop ? coop[st.medida] / totU : null), ""], ["Crecimiento 12 m", pct(yoy("BANCO PRIVADO")) + " · " + pct(yoy("COOPERATIVA")), "bancos · cooperativas"]]);
+    pintarE();
+  }
+  function pintarE() {
+    const mora = st.medida === "mora", med = mora ? "cartera" : st.medida;
+    const tot = new Map(); for (const d of SP()) tot.set(d.anio_mes, (tot.get(d.anio_mes) || 0) + (d[med] || 0));
+    const series = [...selE].map(k => {
+      const pts = EM().filter(d => d.entidad_codigo === k).sort((a, b) => a.anio_mes - b.anio_mes), byAm = new Map(pts.map(x => [x.anio_mes, valor(x, st.medida)]));
+      const data = pts.map(x => { const v = valor(x, st.medida); let y; if (mora) y = v * 100; else if (stE.vista === "monto") y = v / 1e6; else if (stE.vista === "cuota") y = v / tot.get(x.anio_mes) * 100; else { const b = byAm.get(x.anio_mes - 100); y = b ? (v / b - 1) * 100 : null; } return [amFecha(x.anio_mes), y]; });
+      return { name: nom(k), color: palE.color(k), data, grosor: k === ENT ? 2.5 : 2 };
+    });
+    const monto = !mora && stE.vista === "monto";
+    c2.h.textContent = `${MED.find(m => m[0] === st.medida)[1]} por entidad · ${mora ? "morosidad %" : monto ? "millones de USD" : stE.vista === "cuota" ? "cuota del sistema %" : "variación anual %"}`;
+    leyenda(c2.ley, series);
+    lineas(c2.g, series, { fmtY: v => monto ? f0.format(v) : f1.format(v) + " %", fmtT: v => monto ? "USD " + f0.format(v) + " M" : f2.format(v) + " %", etiquetas: true, alto: 300 });
+    const totU = tot.get(ultimoAM), tot12 = tot.get(ultimoAM - 100), porK = new Map(); for (const d of EM()) porK.set(d.entidad_codigo + "|" + d.anio_mes, d);
+    const rk = unicos(EM().map(d => d.entidad_codigo)).map(k => { const a = porK.get(k + "|" + ultimoAM), b = porK.get(k + "|" + (ultimoAM - 100)); if (!a) return null; const va = a[med], vb = b ? b[med] : null; return { k, tipo: nom(CAT[k]?.tipo || ""), monto: va, cuota: va / totU, dcuota: vb != null ? (va / totU - vb / tot12) * 100 : null, crec: vb ? va / vb - 1 : null, mora: a.cartera ? a.cartera_improductiva / a.cartera : null }; }).filter(Boolean);
+    tabla(env3, [{ key: "k", label: "Entidad", fmt: nom }, { key: "tipo", label: "Tipo" }, { key: "monto", label: MED.find(m => m[0] === med)[1], n: true, fmt: usd }, { key: "cuota", label: "Cuota", n: true, fmt: v => pct(v, 2) },
+      { key: "dcuota", label: "Cambio 12 m", n: true, fmt: v => pp(v, 2), clase: v => v > .05 ? "pos" : v < -.05 ? "neg" : "" }, { key: "crec", label: "Crec. 12 m", n: true, fmt: v => pct(v) }, { key: "mora", label: "Mora", n: true, fmt: v => pct(v) }],
+      rk, { ordenable: true, orden: "monto", dir: -1, foco: f => f.k === ENT });
+  }
+  pintar();
+};
+
+/* ---------- 02 Tasas ---------- */
+RENDER.tasas = sec => {
+  cabecera(sec, pag("tasas"), [`La tasa a plazo de los bancos grandes pasó de ${f1.format(bancosProm(piso))} % (${mesTxt(piso.fecha)}) a `, [f1.format(bancosProm(pico)) + " %"], ` (${mesTxt(pico.fecha)}) y hoy está en ${f1.format(bancosProm(ultTasa))} %. Las cooperativas S1 apenas se movieron (${f1.format(piso["COOP SEGMENTO 1"])} → ${f1.format(pico["COOP SEGMENTO 1"])} → ${f1.format(ultTasa["COOP SEGMENTO 1"])} %). En crédito, las tasas viven pegadas al techo regulatorio: cambia de producto para verlo.`]);
+  const PROD = [["DEP", "Depósitos a plazo"], ["CONSUMO", "Consumo"], ["PRODUCTIVO", "Productivo"], ["MICROCRÉDITO", "Microcrédito"], ["INMOBILIARIO", "Inmobiliario"]];
+  const st = { producto: "DEP", periodo: "2019", techo: true };
+  const sel = new Set([ENT, "PICHINCHA", "PACIFICO", "PRODUBANCO", "COOP SEGMENTO 1"]), pal = new Paleta();
+  const barra = barraFiltros(sec);
+  filtro(barra, "Producto", segmentado(PROD, st.producto, v => { st.producto = v; armarChips(); pintar(); }));
+  filtro(barra, "Período", segmentado(PERIODOS, st.periodo, v => { st.periodo = v; pintar(); }));
+  filtro(barra, "Techo (crédito)", segmentado([["1", "Mostrar"], ["0", "Ocultar"]], "1", v => { st.techo = v === "1"; pintar(); }));
+  const fChips = el("div"); filtro(barra, "Entidades y grupos (hasta 6)", fChips);
+  const resumen = el("div"); sec.append(resumen);
+  const c = tarjeta(bloque(sec, ""), "", "", "");
+  const extra = bloque(sec, "");
+  const ORD = g => (g === ENT ? "0" : GRANDES.includes(g) ? "1" : g.startsWith("COOP") ? "3" : "2") + nom(g);
+  const gruposDe = prod => prod === "DEP" ? Object.keys(X.tasas_pasivas).filter(k => k !== "mes") : unicos(TA().filter(d => d.segmento === prod).map(d => d.grupo));
+  function armarChips() {
+    const gs = gruposDe(st.producto).sort((a, b) => ORD(a).localeCompare(ORD(b)));
+    for (const k of [...sel]) if (!gs.includes(k)) sel.delete(k);
+    if (!sel.size) gs.slice(0, 3).forEach(g => sel.add(g));
+    fChips.replaceChildren(chipsSel(gs.map(g => [g, nom(g)]), sel, pal, () => pintar()));
+  }
+  function pintar() {
+    const desde = desdePeriodo(st.periodo), dep = st.producto === "DEP";
+    const series = [...sel].map(k => ({ name: nom(k), color: pal.color(k), data: dep ? TP().map(d => [d.fecha, d[k]]) : TA().filter(d => d.grupo === k && d.segmento === st.producto).sort((a, b) => a.anio_mes - b.anio_mes).map(d => [amFecha(d.anio_mes), d.tasa]) }));
+    if (!dep && st.techo) series.push({ name: "Techo regulatorio", color: css("--ink-2"), discontinua: true, grosor: 1.5, sinPunto: true, data: TECHO().filter(d => d.segmento === st.producto).sort((a, b) => a.anio_mes - b.anio_mes).map(d => [amFecha(d.anio_mes), d.techo]) });
+    c.h.textContent = PROD.find(x => x[0] === st.producto)[1] + " · tasa efectiva anual %";
+    c.nota.textContent = dep ? "Depósitos a plazo nuevos a mezcla de plazo constante (ajuste hedónico por banda de plazo), promedio mensual. Fuente: BCE semanal." : "Colocaciones nuevas del segmento, tasa ponderada por monto (sin ajuste por subsegmento). Techo: tasa máxima vigente ponderada por el monto del sistema en cada subsegmento. Fuente: BCE.";
+    leyenda(c.ley, series);
+    lineas(c.g, series, { xMin: desde, fmtY: v => f0.format(v) + " %", fmtT: v => f2.format(v) + " %", etiquetas: true, alto: 320 });
+    const enRango = s => s.data.filter(d => d[1] != null && +d[0] >= +desde);
+    datos(resumen, series.filter(s => s.name !== "Techo regulatorio").slice(0, 4).map(s => { const r = enRango(s); return [s.name, r.length ? f2.format(r.at(-1)[1]) + " %" : "—", r.length ? "cambio en el período: " + pp(r.at(-1)[1] - r[0][1], 2) : ""]; }));
+    extra.replaceChildren();
+    if (dep) {
+      extra.append(el("h3", { class: "titulo-bloque" }, "Quién movió primero en el ciclo 2022–2025"));
+      const ct = tarjeta(extra, "", "Barra llena: de la primera subida de 1 pp hasta el pico (círculo). Barra tenue: del pico hasta la primera baja de 1 pp. Pasa el cursor para ver las fechas.", "Media móvil de 8 semanas de la tasa a plazo ajustada.");
+      lineaTiempo(ct.g, R.ciclo, ENT);
+    } else {
+      extra.append(el("h3", { class: "titulo-bloque" }, "Cuánto crédito se coloca pegado al techo (desde 2025)"));
+      tabla(tablaEn(extra), [{ key: "segmento", label: "Segmento", fmt: titulo }, { key: "tipo_entidad", label: "Tipo", fmt: nom }, { key: "monto", label: "Monto", n: true, fmt: usd },
+        { key: "tasa_ponderada", label: "Tasa", n: true, fmt: v => f2.format(v) + " %" }, { key: "techo_ponderado", label: "Techo", n: true, fmt: v => f2.format(v) + " %" }, { key: "cuota_a_1pp_del_techo", label: "A ≤ 1 pp del techo", n: true, fmt: v => pct(v, 0) }],
+        R.techos.filter(d => d.monto > 2e8), { foco: f => f.segmento === st.producto });
+    }
+  }
+  armarChips(); pintar();
+};
+
+/* ---------- 03 Sustitución ---------- */
+RENDER.sustitucion = sec => {
+  const F = sust.flujos, S = sust.saldos;
+  cabecera(sec, pag("sustitucion"), ["Por cada punto porcentual que las cooperativas S1 pagan por encima de los bancos, su cuota en las captaciones nuevas a plazo sube ", [f1.format(F.pp_cuota_por_pp_spread) + " pp"], `. En saldos el ajuste es lento (vida media de ${f0.format(S.vida_media_meses)} meses) y en el largo plazo suma ${f1.format(S.pp_largo_plazo_por_pp_spread)} pp, unos `, [usd(S.usd_largo_plazo_por_pp_spread)], ". Mueve el diferencial para ver cuánto dinero se desplaza."]);
+  const SS = sust.serie.map(d => ({ ...d, fecha: new Date(d.mes + "T00:00:00") }));
+  const actual = SS.at(-1).spread, cuotaSaldoAct = SS.filter(d => d.cuota_coop_saldo != null).at(-1).cuota_coop_saldo;
+  const barra = barraFiltros(sec), out = el("div"); sec.append(out);
+  const logistica = z => 1 / (1 + Math.exp(-z));
+  const cuotaFlujo = sp => logistica(F.const + F.coef_spread * sp + F.coef_tendencia * F.tendencia_ultima);
+  const cuotaLP = sp => -(S.const + S.b_spread * sp) / S.a_ajuste / 100;
+  const calcular = sp => {
+    const cf0 = cuotaFlujo(actual), cf1 = cuotaFlujo(sp), lp0 = cuotaLP(actual), lp1 = cuotaLP(sp);
+    datos(out, [["Cuota coop. en captaciones nuevas", pct(cf1), `hoy (modelo): ${pct(cf0)} · cambio ${pp((cf1 - cf0) * 100)}`],
+      ["Flujo mensual que se desplaza", usd((cf1 - cf0) * F.flujo_mensual_bancos_coops), `de ${usd(F.flujo_mensual_bancos_coops)} al mes captados por bancos + coops`],
+      ["Cuota coop. de largo plazo en saldos", pct(lp1), `hoy observada ${pct(cuotaSaldoAct)} · equilibrio actual ${pct(lp0)}`],
+      ["Saldo que migraría en el largo plazo", usd((lp1 - lp0) * S.mercado_plazo_usd), `la mitad en ≈ ${f0.format(S.vida_media_meses)} meses`]]);
+  };
+  const inicial = Math.round(actual * 10) / 10;
+  filtro(barra, `Diferencial coop. S1 − bancos (hoy ${pp(actual, 2)})`, deslizador(-1, 4, 0.1, inicial, v => pp(v), calcular));
+  const st = { periodo: "2015" };
+  filtro(barra, "Período de los gráficos", segmentado(PERIODOS.slice(0, 3), st.periodo, v => { st.periodo = v; pintar(); }));
+  calcular(inicial);
+  const r = el("div", { class: "rejilla r2" }); bloque(sec, "Cómo se movieron").append(r);
+  const g1 = tarjeta(r, "Diferencial de tasa: coop. S1 − bancos (pp)", "", "Tasa a plazo ajustada por plazo; bancos = 6 grandes + otros bancos. Fuente: BCE semanal.");
+  const g2 = tarjeta(r, "Cuota de las cooperativas en depósitos a plazo (%)", "", "Sobre bancos privados + cooperativas. Flujos: BCE (2015 →). Saldos: CAPCOL + SEPS (2021 →).");
+  const g3 = tarjeta(bloque(sec, "La relación detrás del modelo"), "Cada punto es un mes: diferencial vs. cuota de las cooperativas en captaciones nuevas", "Color por etapa. La pendiente que se ve es la que estima el modelo (con tendencia y errores robustos).", "");
+  const ETAPAS = [["2015-01-01", "2019-12-31", "2015–2019", "--c4"], ["2020-01-01", "2022-06-30", "2020 – mediados 2022", "--c3"], ["2022-07-01", "2024-12-31", "Subida de tasas 2022–2024", "--c2"], ["2025-01-01", "2030-01-01", "Bajada 2025–2026", "--c1"]];
+  function pintar() {
+    const desde = new Date(+st.periodo, 0, 1);
+    lineas(g1.g, [{ name: "Diferencial", color: css("--s-coops"), data: SS.map(d => [d.fecha, d.spread]) }], { xMin: desde, cero: true, fmtY: v => f1.format(v), fmtT: v => pp(v, 2), alto: 240 });
+    const sC = [{ name: "Flujos nuevos", color: css("--s-coops"), data: SS.map(d => [d.fecha, d.cuota_coop_flujo * 100]) }, { name: "Saldos", color: css("--s-bancos"), data: SS.map(d => [d.fecha, d.cuota_coop_saldo == null ? null : d.cuota_coop_saldo * 100]) }];
+    leyenda(g2.ley, sC); lineas(g2.g, sC, { xMin: desde, fmtY: v => f0.format(v) + " %", fmtT: v => f1.format(v) + " %", alto: 240, etiquetas: true });
+    const etapa = d => ETAPAS.find(e => d.mes >= e[0] && d.mes <= e[1]);
+    leyenda(g3.ley, ETAPAS.map(e => ({ name: e[2], color: css(e[3]) })), "punto");
+    dispersion(g3.g, SS.filter(d => d.fecha >= desde && d.spread != null && d.cuota_coop_flujo != null).map(d => { const e = etapa(d); return { x: d.spread, y: d.cuota_coop_flujo * 100, color: css(e[3]), label: mesTxt(d.fecha), tip: [{ name: "diferencial", value: pp(d.spread, 2) }, { name: "cuota coop. flujos", value: f1.format(d.cuota_coop_flujo * 100) + " %" }, { name: "etapa", value: e[2] }] }; }),
+      { etqX: "diferencial coop. S1 − bancos (pp)", etqY: "cuota coop. en captaciones nuevas (%)", fmtX: v => f1.format(v), fmtY: v => f0.format(v) + " %", alto: 340 });
+  }
+  pintar();
+};
+
+/* ---------- 04 Liderazgo ---------- */
+RENDER.liderazgo = sec => {
+  const MR = R.matriz_respuesta, G = MR.grupos;
+  const meanFila = g => { const i = G.indexOf(g); const f = MR.p[i].filter((v, j) => v != null && !G[j].startsWith("COOP")); return f.reduce((a, b) => a + b, 0) / f.length; };
+  cabecera(sec, pag("liderazgo"), [[nom(lideres[0][0]) + " y " + nom(lideres[1][0])], ` son los más seguidos: cuando mueven primero su tasa pasiva, el resto de bancos grandes los sigue en 0–2 meses en ${pct(meanFila(lideres[0][0]), 0)} y ${pct(meanFila(lideres[1][0]), 0)} de los casos. Bolivariano e Internacional mueven seguido pero se les sigue menos. Las cooperativas S1 casi nunca siguen a los bancos. Elige una entidad para ver a quién arrastra y a quién sigue.`]);
+  const st = { e: ENT };
+  const barra = barraFiltros(sec);
+  filtro(barra, "Entidad", desplegable(G.map(g => [g, nom(g)]), st.e, v => { st.e = v; pintar(); }));
+  const r = el("div", { class: "rejilla r2" }); sec.append(r);
+  const a = tarjeta(r, "", "", "Probabilidad de que la entidad de la barra mueva en la misma dirección en 0–2 meses. Marca negra: su probabilidad base de moverse en cualquier ventana de 3 meses.");
+  const b = tarjeta(r, "", "", "Probabilidad de que la entidad elegida siga cuando la de la barra mueve primero. Marca negra: probabilidad base de la entidad elegida.");
+  const m = tarjeta(bloque(sec, "La matriz completa"), "Fila mueve primero → columna sigue (%)", "La entidad elegida queda resaltada; el resto se atenúa.", "Eventos: cambio mensual ≥ 0,20 pp de la tasa a plazo ajustada, 2017–2026. “Sigue”: mueve en la misma dirección en 0–2 meses sin haberse movido antes.");
+  const r2 = el("div", { class: "rejilla gt" }); bloque(sec, "Velocidad y ciclo").append(r2);
+  const li = tarjeta(r2, "Índice de liderazgo (pp)", "", "Cuánto lo siguen (media de su fila) menos cuánto sigue él (media de su columna). Positivo: líder.");
+  const envE = tablaEn(r2, "Velocidad de ajuste a la tasa de los pares", "Modelo de corrección de error mensual hacia el promedio de los 6 bancos grandes (sin la propia entidad).");
+  const col = g => g === ENT ? css("--s-foco") : g.startsWith("COOP") ? css("--s-coops") : css("--s-bancos");
+  function pintar() {
+    const i = G.indexOf(st.e);
+    a.h.textContent = `Cuando ${nom(st.e)} mueve primero, lo siguen…`; b.h.textContent = `${nom(st.e)} sigue a…`;
+    barras(a.g, G.map((g, j) => ({ g, v: MR.p[i][j], base: MR.base[j] })).filter(x => x.v != null).sort((x, y) => y.v - x.v).map(x => ({ label: nom(x.g), value: x.v * 100, color: col(x.g), marca: x.base * 100, foco: x.g === ENT, tip: [{ name: "lo sigue", value: pct(x.v, 0) }, { name: "prob. base", value: pct(x.base, 0) }] })), { fmt: v => f0.format(v) + " %", izq: 110 });
+    barras(b.g, G.map((g, j) => ({ g, v: MR.p[j][i] })).filter(x => x.v != null).sort((x, y) => y.v - x.v).map(x => ({ label: nom(x.g), value: x.v * 100, color: col(x.g), marca: MR.base[i] * 100, foco: x.g === ENT, tip: [{ name: `${nom(st.e)} lo sigue`, value: pct(x.v, 0) }, { name: `prob. base de ${nom(st.e)}`, value: pct(MR.base[i], 0) }] })), { fmt: v => f0.format(v) + " %", izq: 110 });
+    matriz(m.g, G, MR.p, MR.base, st.e);
+    barras(li.g, Object.entries(R.indice_liderazgo).map(([k, v]) => ({ label: nom(k), value: v * 100, color: k === st.e ? css("--s-foco") : col(k), foco: k === st.e })), { fmt: v => (v > 0 ? "+" : "") + f0.format(v) + " pp", izq: 110 });
+    tabla(envE, [{ key: "grupo", label: "Entidad / grupo", fmt: nom }, { key: "alpha", label: "Ajuste mensual", n: true, fmt: v => pct(-v, 0) }, { key: "vida_media", label: "Vida media", n: true, fmt: v => v == null ? "no ajusta" : f1.format(v) + " m" },
+      { key: "traspaso_corto", label: "Traspaso 3 m", n: true, fmt: v => pct(v, 0) }, { key: "brecha_media_2025", label: "Brecha 2025+", n: true, fmt: v => pp(v, 2) }], R.correccion_error, { ordenable: true, foco: f => f.grupo === st.e });
+  }
+  pintar();
+};
+
+/* ---------- 05 Anticipar ---------- */
+RENDER.anticipar = sec => {
+  const PR = R.anticipacion.prediccion, CB_ = R.anticipacion.con_balance, eS = R.anticipacion.evaluacion.sube.at(-1), eB = R.anticipacion.evaluacion.baja.at(-1);
+  const sh = senalHoy();
+  cabecera(sec, pag("anticipar"), ["Una logística con la brecha de cada banco frente al mercado, la tendencia del mercado y los movimientos recientes de los líderes anticipa subidas y bajadas de ≥ 0,15 pp a 4 semanas con ", ["AUC " + f2.format(eS.auc) + " y " + f2.format(eB.auc)], ` fuera de muestra: sirve como alerta, no como certeza. Hoy domina la señal de ${sh.sustantivo}: la mayor probabilidad la tienen ${sh.texto}. Elige un banco para ver cómo se comportó el modelo con él.`]);
+  const bancos = unicos(OOS().map(d => d.banco));
+  const st = { b: bancos.find(b => b !== ENT) || bancos[0], senal: "baja", periodo: "2022" };
+  const barra = barraFiltros(sec);
+  filtro(barra, "Banco", desplegable(bancos.map(b => [b, nom(b)]), st.b, v => { st.b = v; pintar(); }));
+  filtro(barra, "Señal", segmentado([["baja", "Bajada"], ["sube", "Subida"]], st.senal, v => { st.senal = v; pintar(); }));
+  filtro(barra, "Desde", segmentado([["2020", "2020"], ["2022", "2022"], ["2024", "2024"]], st.periodo, v => { st.periodo = v; pintar(); }));
+  const h = tarjeta(sec, "", "Línea: probabilidad estimada esa semana sin conocer el futuro. Marcas arriba: semanas en que efectivamente vino el movimiento en las 4 semanas siguientes. Línea punteada: frecuencia histórica.", "");
+  const r = el("div", { class: "rejilla gt" }); bloque(sec, "Hoy y por qué").append(r);
+  const pr = tarjeta(r, "", "", `Con datos hasta la semana del ${fechaTxt(PR[0]?.semana)}. Marca negra: frecuencia histórica. Pasa el cursor para ver la tasa, la brecha y el balance del banco.`);
+  const envC = tablaEn(r, "Qué anticipa el movimiento", "Coeficientes estandarizados (positivo = aumenta la probabilidad). Ordena con clic.");
+  const r2 = el("div", { class: "rejilla r2" }); bloque(sec, "¿Ayuda el balance (mora, liquidez, solvencia)?").append(r2);
+  const envB = tablaEn(r2, "AUC fuera de muestra sin y con balance", `Mismas filas 2023–2026, en dos etapas (base desde 2016 + balance desde 2021). Diferencia en AUC media: subidas ${(CB_.sube.diferencia >= 0 ? "+" : "") + f3.format(CB_.sube.diferencia)} (IC 90 %: ${f3.format(CB_.sube.ic90[0])} a ${f3.format(CB_.sube.ic90[1])}); bajadas ${(CB_.baja.diferencia >= 0 ? "+" : "") + f3.format(CB_.baja.diferencia)} (${f3.format(CB_.baja.ic90[0])} a ${f3.format(CB_.baja.ic90[1])}). Mejora pequeña, no concluyente.`);
+  const envB2 = tablaEn(r2, "Qué variable de balance empuja el movimiento", "Segunda etapa, coeficientes estandarizados. La liquidez que cae empuja subidas; más liquidez o capital que los pares, bajadas.");
+  const ETQ = { brecha_mercado: "Brecha propia vs. mercado", brecha_coop_s1: "Brecha coop. S1 − propia", nivel: "Nivel de su tasa", flujo_4_vs_13s: "Captación reciente vs. trimestre", rivales_suben_4s: "Rivales que subieron (4 s)", rivales_bajan_4s: "Rivales que bajaron (4 s)", cambio_pichincha_4s: "Cambio de Pichincha (4 s)", cambio_guayaquil_4s: "Cambio de Guayaquil (4 s)",
+    d3_liquidez: "Liquidez, cambio 3 m", rel_liquidez: "Liquidez frente a pares", d3_morosidad: "Mora, cambio 3 m", rel_morosidad: "Mora frente a pares", d3_solvencia: "Solvencia, cambio 3 m", rel_solvencia: "Solvencia frente a pares" };
+  const etq = k => ETQ[k] || k.replace(/^cambio_propio_(\d+)s$/, "Cambio propio ($1 s)").replace(/^cambio_mercado_(\d+)s$/, "Cambio del mercado ($1 s)");
+  const CO = R.anticipacion.coeficientes, cls = v => v > .1 ? "pos" : v < -.1 ? "neg" : "";
+  function pintar() {
+    const desde = new Date(+st.periodo, 0, 1), dd = OOS().filter(d => d.banco === st.b).sort((a, b) => a.f - b.f);
+    const k = "p_" + st.senal, y = "y_" + st.senal, color = st.senal === "baja" ? css("--s-bancos") : css("--s-coops"), base = st.senal === "baja" ? eB.frecuencia : eS.frecuencia, verbo = st.senal === "baja" ? "bajar" : "subir";
+    h.h.textContent = `${nom(st.b)}: probabilidad de ${verbo} ≥ 0,15 pp en las 4 semanas siguientes`;
+    leyenda(h.ley, [{ name: "Probabilidad estimada", color }, { name: "Frecuencia histórica", color: css("--muted") }, { name: "Movimiento real (marcas arriba)", color }]);
+    lineas(h.g, [{ name: "Probabilidad estimada", color, data: dd.map(d => [d.f, d[k] == null ? null : d[k] * 100]) }, { name: "Frecuencia histórica", color: css("--muted"), discontinua: true, grosor: 1.5, sinPunto: true, data: dd.map(d => [d.f, base * 100]) }],
+      { xMin: desde, yMin: 0, fmtY: v => f0.format(v) + " %", fmtT: v => f0.format(v) + " %", fmtFecha: d => "Semana del " + d.toLocaleDateString("es-EC", { day: "numeric", month: "short", year: "numeric" }), eventos: dd.filter(d => d[y] === 1).map(d => ({ fecha: d.f, color })), alto: 280 });
+    pr.h.textContent = `Probabilidad de ${verbo} en las próximas 4 semanas`;
+    barras(pr.g, [...PR].sort((a, b) => b[k] - a[k]).map(x => ({ label: nom(x.banco), value: x[k] * 100, color: x.banco === st.b ? css("--s-foco") : color, foco: x.banco === st.b, marca: base * 100,
+      tip: [{ name: "baja", value: pct(x.p_baja, 0) }, { name: "sube", value: pct(x.p_sube, 0) }, { name: "brecha vs. mercado", value: pp(x.brecha_mercado, 2) }, { name: "tasa actual", value: f2.format(x.nivel) + " %" }, ...(x.liquidez != null ? [{ name: "liquidez", value: f1.format(x.liquidez) + " %" }, { name: "morosidad", value: f1.format(x.morosidad) + " %" }] : [])] })), { fmt: v => f0.format(v) + " %", izq: 110 });
+    tabla(envC, [{ key: "v", label: "Variable", fmt: etq }, { key: "sube", label: "Subir", n: true, fmt: v => f2.format(v), clase: cls }, { key: "baja", label: "Bajar", n: true, fmt: v => f2.format(v), clase: cls }], Object.keys(CO.sube).map(k2 => ({ v: k2, sube: CO.sube[k2], baja: CO.baja[k2] })), { ordenable: true, orden: st.senal, dir: -1 });
+  }
+  const fb = CB_.sube.tabla.map((f, i) => ({ anio: String(f.anio), s0: f.auc_sin_balance, s1: f.auc_con_balance, b0: CB_.baja.tabla[i]?.auc_sin_balance, b1: CB_.baja.tabla[i]?.auc_con_balance }));
+  fb.push({ anio: "Media", s0: CB_.sube.auc_media_sin, s1: CB_.sube.auc_media_con, b0: CB_.baja.auc_media_sin, b1: CB_.baja.auc_media_con });
+  tabla(envB, [{ key: "anio", label: "Año" }, { key: "s0", label: "Sube: AUC sin", n: true, fmt: v => f3.format(v) }, { key: "s1", label: "AUC con", n: true, fmt: v => f3.format(v) }, { key: "b0", label: "Baja: AUC sin", n: true, fmt: v => f3.format(v) }, { key: "b1", label: "AUC con", n: true, fmt: v => f3.format(v) }], fb);
+  tabla(envB2, [{ key: "v", label: "Variable", fmt: etq }, { key: "s", label: "Subir", n: true, fmt: v => f2.format(v), clase: cls }, { key: "b", label: "Bajar", n: true, fmt: v => f2.format(v), clase: cls }], Object.keys(CB_.sube.coeficientes).filter(k => k !== "logit_base").map(k => ({ v: k, s: CB_.sube.coeficientes[k], b: CB_.baja.coeficientes[k] })));
+  pintar();
+};
+
+/* ---------- 06 Elasticidades ---------- */
+RENDER.demanda = sec => {
+  const H = dem.heterogeneidad;
+  cabecera(sec, pag("demanda"), ["Subir la tasa de depósitos a plazo 1 pp aumenta la cuota de una entidad en su cantón en ≈ ", [f1.format(alphaDep * 100) + " %"], `: demanda inelástica (elasticidad ≈ ${f1.format(alphaDep * ultTasa[ENT])}). El cliente compara bancos y cooperativas en un mismo pozo (σ ≈ 0). La mora sí castiga: `, ["1 pp de mora ≈ " + f2.format(acc.mora_equivalente_pp) + " pp de tasa"], " para un banco. En crédito la tasa no explica la cuota."]);
+  const r = el("div", { class: "rejilla r2 arriba" }); sec.append(r);
+  const hg = tarjeta(r, "Sensibilidad a la tasa en depósitos a plazo (α)", "", "Barras = α del resto + diferencial de la entidad; línea vertical = α del resto. Pasa el cursor para ver el error estándar.");
+  const ordenH = ["pichincha", "produbanco", "guayaquil", "internacional", "pacifico", "bolivariano", "cooperativas"];
+  barras(hg.g, ordenH.filter(k => H[k]).map(k => ({ label: k === "cooperativas" ? "Cooperativas" : nom(k.toUpperCase()), value: H[k].alpha_resto + H[k].diferencia, color: k === ENT.toLowerCase() ? css("--s-foco") : k === "cooperativas" ? css("--s-coops") : css("--s-bancos"), foco: k === ENT.toLowerCase(),
+    tip: [{ name: "α entidad", value: f3.format(H[k].alpha_resto + H[k].diferencia) }, { name: "diferencial", value: f3.format(H[k].diferencia) + " (e.e. " + f3.format(H[k].se_diferencia) + ")" }] })), { fmt: v => f3.format(v), ref: alphaDep, izq: 110 });
+  const calc = el("div", { class: "tarjeta" }); r.append(calc); calc.append(el("h3", {}, "Calculadora: ¿cuánto cuesta la mora en captación?"));
+  const bc = el("div", { class: "filtros" }); bc.style.cssText = "border:0;padding:4px 0;background:transparent"; calc.append(bc);
+  const outC = el("div"); calc.append(outC, el("p", { class: "nota" }, "Coeficiente de mora del modelo con rezago de 1 mes y semi-elasticidad a la tasa. El monto aplica sobre el flujo mensual de captación a plazo de la entidad (últimos 6 meses)."));
+  const simE = X.simulador.entidades, opc = Object.keys(simE).map(k => [k, nom(k)]), stc = { e: ENT in simE ? ENT : opc[0][0], mora: 1 };
+  const flujoDe = k => simE[k].cantones.propio.reduce((a, b) => a + b, 0);
+  const calcular = () => {
+    const tipo = CAT[stc.e]?.tipo === "COOPERATIVA" ? "cooperativas" : CAT[stc.e]?.tipo === "MUTUALISTA" ? "otros" : "bancos";
+    const b = d1disc.coeficientes["morosidad_" + tipo], efecto = Math.exp(b * stc.mora) - 1, eqpp = -b * stc.mora / d1disc.alpha_con_balance;
+    datos(outC, [["Cambio en cuota de captación nueva", pct(efecto, 1), `${nom(stc.e)}, +${f2.format(stc.mora)} pp de mora`], ["Equivale a mover la tasa", pp(-eqpp, 2), "para compensarlo habría que pagar " + f2.format(Math.abs(eqpp)) + " pp más"], ["Flujo mensual afectado", usd(efecto * flujoDe(stc.e)), "de " + usd(flujoDe(stc.e)) + " al mes"], ["Significancia", sig(b, d1disc.errores["morosidad_" + tipo]) || "no significativo", tipo === "cooperativas" ? "en cooperativas el efecto es débil" : "*** p<0,01 · ** p<0,05 · * p<0,10"]]);
+    outC.firstChild.className = "rejilla r2"; /* 4 datos en media tarjeta quedaban de ~120 px */
+  };
+  filtro(bc, "Entidad", desplegable(opc, stc.e, v => { stc.e = v; calcular(); }));
+  filtro(bc, "Aumento de mora", deslizador(0.25, 3, 0.25, 1, v => "+" + f2.format(v) + " pp", v => { stc.mora = v; calcular(); }));
+  calcular();
+  const b2 = bloque(sec, "Modelos estimados"), barra = barraFiltros(b2), st = { prod: "todos" };
+  const PROD = { DEP_PLAZO: "Depósitos a plazo", CONSUMO: "Crédito de consumo", "MICROCRÉDITO": "Microcrédito", PRODUCTIVO: "Crédito productivo" };
+  const envL = tablaEn(b2, "", "Logit (Berry, 1994) por cantón × mes con efectos fijos entidad × cantón y cantón × mes; tasa instrumentada con la tasa de la misma entidad en otras provincias; errores agrupados por entidad. *** p<0,01 · ** p<0,05 · * p<0,10. Fuente: BCE, flujos 2021–2026.");
+  const fL = Object.entries(dem.modelos).map(([k, v]) => { const [pr, e] = k.split("|"); return { p: pr, e, a: v.coeficientes.tasa, se: v.errores.tasa, s: v.coeficientes.ln_s_g, sse: v.errores.ln_s_g, f: v.primera_etapa_f.tasa, n: v.n }; });
+  const pintarL = () => tabla(envL, [{ key: "p", label: "Producto", fmt: v => PROD[v] || v }, { key: "e", label: "Modelo" }, { key: "a", label: "α tasa", n: true, fmt: (v, f) => f3.format(v) + sig(v, f.se) }, { key: "se", label: "e.e.", n: true, fmt: v => "(" + f3.format(v) + ")" },
+    { key: "s", label: "σ nido", n: true, fmt: (v, f) => v == null ? "—" : f2.format(v) + sig(v, f.sse) }, { key: "f", label: "F 1.ª etapa", n: true, fmt: v => f0.format(v) }, { key: "n", label: "Obs.", n: true, fmt: v => f0.format(v) }], fL.filter(f => st.prod === "todos" || f.p === st.prod));
+  filtro(barra, "Producto", segmentado([["todos", "Todos"], ...Object.entries(PROD)], st.prod, v => { st.prod = v; pintarL(); }));
+  pintarL();
+  const d3 = dem.disciplina["rezago3|por_nido"], NIDO = { bancos: "Bancos", cooperativas: "Cooperativas", otros: "Mutualistas" }, VARB = { morosidad: "Mora", liquidez: "Liquidez", solvencia: "Solvencia" };
+  const envD = tablaEn(bloque(sec, "Disciplina de mercado: mora, liquidez y solvencia"), "", `Logit por cantón con la tasa instrumentada más mora, liquidez y solvencia de la entidad rezagadas. ${f0.format(d1disc.entidades)} entidades con balance. Efecto = cambio % de la cuota de captación nueva por +1 pp. Solvencia negativa por mecánica contable (no se interpreta). La semi-elasticidad a la tasa no cambia al agregar el balance (${f3.format(d1disc.alpha_sin_balance)} → ${f3.format(d1disc.alpha_con_balance)}).`);
+  const fD = []; for (const v of ["morosidad", "liquidez", "solvencia"]) for (const n of ["bancos", "cooperativas", "otros"]) { const k = `${v}_${n}`; if (k in d1disc.coeficientes) fD.push({ v, n, b1: d1disc.coeficientes[k], e1: d1disc.errores[k], b3: d3.coeficientes[k], e3: d3.errores[k] }); }
+  const ef = (b, e) => (b > 0 ? "+" : "") + f1.format(b * 100) + " %" + sig(b, e);
+  tabla(envD, [{ key: "v", label: "Variable (+1 pp)", fmt: v => VARB[v] }, { key: "n", label: "Entidad", fmt: n => NIDO[n] }, { key: "b1", label: "Efecto en cuota", n: true, fmt: (b, f) => ef(b, f.e1) }, { key: "e1", label: "e.e.", n: true, fmt: v => "(" + f1.format(v * 100) + ")" }, { key: "b3", label: "Con rezago de 3 m", n: true, fmt: (b, f) => ef(b, f.e3) }], fD);
+  const envT = tablaEn(bloque(sec, "Crédito pegado al techo regulatorio"), "", "Colocaciones nuevas desde enero 2025. Fuente: BCE semanal y tasas máximas vigentes del BCE.");
+  tabla(envT, [{ key: "segmento", label: "Segmento", fmt: titulo }, { key: "tipo_entidad", label: "Tipo", fmt: nom }, { key: "monto", label: "Monto", n: true, fmt: usd }, { key: "tasa_ponderada", label: "Tasa", n: true, fmt: v => f2.format(v) + " %" }, { key: "techo_ponderado", label: "Techo", n: true, fmt: v => f2.format(v) + " %" }, { key: "cuota_a_1pp_del_techo", label: "A ≤ 1 pp del techo", n: true, fmt: v => pct(v, 0) }], R.techos.filter(d => d.monto > 2e8), { ordenable: true });
+};
+
+/* ---------- 07 Simulador ---------- */
+RENDER.simulador = sec => {
+  const SIM = X.simulador, E = SIM.entidades;
+  cabecera(sec, pag("simulador"), ["Elige una entidad, cuánto mueve su tasa de depósitos a plazo y dónde. El modelo de demanda por cantón calcula ", ["cuánto dinero atrae, de quién sale y cuánto cuesta"], ". La clave es el re-precio: si la subida aplica también al saldo que la entidad ya tiene, cada dólar nuevo sale mucho más caro que la tasa."]);
+  const params = new URLSearchParams(location.hash.split("?")[1] || "");
+  const st = { e: params.get("e") && E[params.get("e")] ? params.get("e") : (E[ENT] ? ENT : Object.keys(E)[0]), dpp: 0.25, alcance: "pais", region: "COSTA", provincia: "", reprecio: "si" };
+  const barra = barraFiltros(sec);
+  /* Elegir región o provincia activa ese alcance: antes, con "Todo el país" seleccionado, cambiarlas no movía nada. */
+  const usarAlcance = a => { st.alcance = a; segA.fijar(a); calc(); };
+  const selP = desplegable([], "", v => { st.provincia = v; usarAlcance("provincia"); });
+  const cargarProv = () => { const ps = unicos(E[st.e].cantones.provincia.filter(Boolean)).sort(); if (!ps.includes(st.provincia)) st.provincia = ps[0]; selP.cargar(ps.map(x => [x, titulo(x)]), st.provincia); };
+  filtro(barra, "Entidad", desplegable(Object.keys(E).map(k => [k, nom(k)]), st.e, v => { st.e = v; cargarProv(); calc(); }));
+  filtro(barra, "Cambio de tasa", deslizador(-1, 1, 0.05, st.dpp, v => pp(v, 2), v => { st.dpp = v; calc(); }));
+  const segA = segmentado([["pais", "Todo el país"], ["brecha", "Cantones con brecha ≥ 2 pp"], ["region", "Una región"], ["provincia", "Una provincia"]], st.alcance, v => { st.alcance = v; calc(); });
+  filtro(barra, "Alcance", segA);
+  filtro(barra, "Región", desplegable(REGIONES.slice(1), st.region, v => { st.region = v; usarAlcance("region"); }));
+  filtro(barra, "Provincia", selP);
+  filtro(barra, "La subida aplica a", segmentado([["si", "Todo el saldo (re-precio)"], ["no", "Solo dinero nuevo"]], st.reprecio, v => { st.reprecio = v; calc(); }));
+  const out = el("div"); sec.append(out);
+  /* Tendencia: saldo a plazo histórico (CAPCOL/SEPS) y proyección sin y con el cambio de tasa. */
+  const VM = R.sustitucion.saldos.vida_media_meses;
+  const stT = { h: 24, resp: "inmediata" };
+  const bt = bloque(sec, "Cómo cambia la tendencia del saldo");
+  const tt_ = tarjeta(bt, "", "", "");
+  const bT = el("div", { class: "filtros" }); bT.style.cssText = "border:0;padding:0 0 6px;background:transparent;margin:0"; tt_.h.after(bT);
+  filtro(bT, "Horizonte", segmentado([["12", "12 meses"], ["24", "24 meses"], ["36", "36 meses"]], String(stT.h), v => { stT.h = +v; calc(); }));
+  filtro(bT, "Respuesta de los clientes", segmentado([["inmediata", "Inmediata"], ["gradual", `Gradual (vida media ${f0.format(VM)} meses)`]], stT.resp, v => { stT.resp = v; calc(); }));
+  const resT = el("p", { class: "sub" }); bT.after(resT);
+  const fechaAM = am => new Date(Math.floor(am / 100), am % 100 - 1, 1);
+  function tendencia(e, gana, dr, saldoAlc) {
+    const hist = EM().filter(d => d.entidad_codigo === st.e).sort((a, b) => a.anio_mes - b.anio_mes);
+    tt_.h.textContent = `Saldo de depósitos a plazo de ${nom(st.e)} (millones de USD)`;
+    if (hist.length < 13) { vacio(tt_.g, "Sin historia de saldos para esta entidad."); resT.textContent = ""; return; }
+    const ult = hist.at(-1), S0 = ult.dep_plazo, S12 = hist.at(-13).dep_plazo, g = Math.pow(S0 / S12, 1 / 12) - 1, f0d = fechaAM(ult.anio_mes);
+    const P = e.plazo_medio_dias / 30, tasa = e.tasa_actual / 100;
+    const flujo = [], base = [[f0d, S0 / 1e6]], esc = [[f0d, S0 / 1e6]];
+    let costoAc = 0, extra = 0;
+    for (let t = 1; t <= stT.h; t++) {
+      flujo[t] = gana * (stT.resp === "gradual" ? 1 - Math.pow(0.5, t / VM) : 1);
+      /* saldo extra vivo: flujos de los últimos P meses (P fraccional = plazo medio / 30) */
+      extra = 0; for (let k = 1; k <= t; k++) extra += flujo[k] * Math.min(1, Math.max(0, P - (t - k)));
+      const f = new Date(f0d.getFullYear(), f0d.getMonth() + t, 1), b = S0 * Math.pow(1 + g, t);
+      base.push([f, b / 1e6]); esc.push([f, (b + extra) / 1e6]);
+      costoAc += ((st.reprecio === "si" ? dr * saldoAlc : 0) + (tasa + dr) * extra) / 12;
+    }
+    const histS = hist.slice(-36).map(d => [fechaAM(d.anio_mes), d.dep_plazo / 1e6]);
+    leyenda(tt_.ley, [{ name: "Histórico", color: css("--ink-2") }, { name: "Sin cambio (tendencia de 12 meses)", color: css("--s-neutro") }, { name: `Con ${pp(st.dpp, 2)}`, color: css("--s-foco") }]);
+    lineas(tt_.g, [{ name: "Histórico", color: css("--ink-2"), data: histS, sinPunto: true }, { name: "Sin cambio", color: css("--s-neutro"), data: base, discontinua: true }, { name: `Con ${pp(st.dpp, 2)}`, color: css("--s-foco"), data: esc, discontinua: true, grosor: 2.5 }],
+      { alto: 300, fmtY: v => f0.format(v), fmtT: v => "USD " + f0.format(v) + " M", aria: "saldo a plazo histórico y proyectado" });
+    resT.textContent = `En ${stT.h} meses: ${extra >= 0 ? "+" : "−"}${usd(Math.abs(extra))} de saldo frente a la tendencia (${pct(extra / (S0 * Math.pow(1 + g, stT.h)))}), con un ${st.dpp >= 0 ? "costo" : "ahorro"} acumulado de intereses de ${usd(Math.abs(costoAc))}. Tendencia sin cambio: ${pct(Math.pow(1 + g, 12) - 1)} anual.`;
+    tt_.nota.textContent = `Histórico: saldo a plazo de la entidad en todo el país (CAPCOL/SEPS, hasta ${mesTxt(f0d)}). “Sin cambio” prolonga el crecimiento de los últimos 12 meses. “Con el cambio” suma el saldo adicional: el flujo extra de cada mes permanece ≈ ${f0.format(e.plazo_medio_dias)} días (plazo medio), así que el saldo sube durante ese plazo y luego se estabiliza. “Gradual” supone que los clientes reaccionan con la vida media del ajuste bancos ↔ cooperativas (capítulo 03). El costo incluye el re-precio si está activo. No proyecta reacciones de los rivales.`;
+  }
+  const r = el("div", { class: "rejilla" }); bloque(sec, "De dónde sale (o a dónde va) el dinero").append(r);
+  const q = tarjeta(r, "Cambio en el flujo mensual de cada rival (millones de USD)", "", "Negativo: el rival pierde captación a favor de la entidad.");
+  const envC = tablaEn(r, "Por cantón", "Ordena con clic en los encabezados.");
+  const nota = el("p", { class: "nota" }); sec.append(nota);
+  cargarProv();
+  function calc() {
+    const e = E[st.e], C = filas(e.cantones), g = Math.exp(e.alpha * st.dpp);
+    const enAlcance = c => st.alcance === "pais" || (st.alcance === "brecha" && c.brecha_pp >= 2) || (st.alcance === "region" && c.region === st.region) || (st.alcance === "provincia" && c.provincia === st.provincia);
+    let gana = 0, saldoAlc = 0, propioAlc = 0; const perdida = new Array(SIM.rivales.length).fill(0), porC = [];
+    C.forEach((c, i) => {
+      if (!enAlcance(c) || !c.total) return;
+      const s = c.propio / c.total, D = 1 - s + s * g, ds = s * g / D - s, gC = c.total * ds;
+      gana += gC; saldoAlc += c.saldo_plazo; propioAlc += c.propio;
+      e.rivales[i].forEach((v, k) => { perdida[k] += v * (1 / D - 1); });
+      porC.push({ canton: c.canton, provincia: c.provincia, total: c.total, cuota: s, cuota_nueva: s + ds, gana: gC, brecha: c.brecha_pp });
+    });
+    if (st.alcance === "pais") saldoAlc = e.saldo_plazo_total;
+    const dr = st.dpp / 100, saldoExtra = gana * e.plazo_medio_dias / 30;
+    const costo = (st.reprecio === "si" ? dr * saldoAlc : 0) + (e.tasa_actual / 100 + dr) * saldoExtra, cm = saldoExtra > 0 ? costo / saldoExtra : null;
+    datos(out, [
+      ["Flujo mensual adicional", usd(gana), propioAlc ? `${pct(gana / propioAlc)} sobre su captación de ${usd(propioAlc)} al mes en el alcance` : "sin captación en el alcance"],
+      ["Saldo adicional (estado estable)", usd(saldoExtra), `plazo medio ${f0.format(e.plazo_medio_dias)} días`],
+      [st.dpp >= 0 ? "Costo anual adicional" : "Ahorro anual de intereses", usd(Math.abs(costo)), st.reprecio === "si" ? `re-precia ${usd(saldoAlc)} de saldo` : "sin re-precio del saldo existente"],
+      ["Costo marginal del fondeo nuevo", st.dpp > 0 && cm != null ? f1.format(cm * 100) + " %" : "—", `tasa actual ${f2.format(e.tasa_actual)} % · α ${f3.format(e.alpha)}`]]);
+    barras(q.g, SIM.rivales.map((k, i) => ({ k, v: perdida[i] })).filter(x => x.k !== st.e && Math.abs(x.v) > 1).sort((a, b) => a.v - b.v).map(x => ({ label: nom(x.k), value: x.v / 1e6, color: x.k === "COOPERATIVAS" ? css("--s-coops") : x.k === "OTROS" ? css("--s-neutro") : x.k === ENT ? css("--s-foco") : css("--s-bancos"), tip: [{ name: "cambio mensual", value: usd(x.v) }, { name: "parte del total", value: pct(gana ? Math.abs(x.v / gana) : null, 0) }] })), { fmt: v => f2.format(v), izq: 120 });
+    tabla(envC, [{ key: "canton", label: "Cantón", fmt: titulo }, { key: "provincia", label: "Provincia", fmt: titulo }, { key: "total", label: "Flujo del cantón", n: true, fmt: usd }, { key: "cuota", label: "Cuota", n: true, fmt: v => pct(v) }, { key: "cuota_nueva", label: "Cuota nueva", n: true, fmt: v => pct(v) },
+      { key: "gana", label: "Cambio mensual", n: true, fmt: usd, clase: v => v > 0 ? "pos" : v < 0 ? "neg" : "" }, { key: "brecha", label: "Brecha", n: true, fmt: v => v == null ? "—" : pp(v) }], porC, { ordenable: true, orden: "gana", dir: st.dpp >= 0 ? -1 : 1 });
+    tendencia(e, gana, dr, saldoAlc);
+    nota.textContent = "Cómo se calcula: logit simple por cantón con flujo total fijo. Con g = e^(α·Δtasa), la cuota pasa de s a s·g/(1 − s + s·g) y cada rival se ajusta por 1/(1 − s + s·g). Flujos: promedio mensual de los últimos 6 meses (BCE). Saldo adicional = flujo adicional × plazo medio. Costo = subida × saldo re-preciado + (tasa + subida) × saldo adicional. Los flujos BCE incluyen renovaciones: la respuesta de clientes nuevos puede ser mayor que la estimada.";
+  }
+  calc();
+};
+
+/* ---------- 08 Cantones ---------- */
+RENDER.cantones = sec => {
+  const CA = R.cantones, CP = R.clusters_canton.perfil;
+  const opE = acc.oportunidades.depositos.top.filter(d => d.brecha_pp >= 2).slice(0, 4).map(d => titulo(d.canton)).join(", ");
+  cabecera(sec, pag("cantones"), [`Los cantones forman un continuo, pero se pueden agrupar en ${CP.length} tipos de mercado según tamaño, peso de las cooperativas, microcrédito, intermediación y crecimiento. Una oportunidad es un cantón donde una entidad rinde `, ["por debajo de lo que ella misma logra en mercados parecidos de su región"], `: para ${ent}, ${opE}. Elige ejes, filtra y cambia de entidad.`]);
+  const VARS = { cuota_coop_depositos: ["Cuota coop. en depósitos", v => pct(v, 0), 100], crec_depositos: ["Crecimiento anual de depósitos", v => pct(v), 100], crec_cartera: ["Crecimiento anual de cartera", v => pct(v), 100], cartera_depositos: ["Cartera / depósitos", v => f2.format(v), 1],
+    hhi_depositos: ["HHI de depósitos", v => f0.format(v), 1], morosidad: ["Morosidad", v => pct(v), 100], spread_coop_banco: ["Diferencial coop − banco (pp)", v => pp(v), 1], avance_coop_depositos_pp: ["Avance coop. 3 años (pp)", v => pp(v), 1], bancos: ["Número de bancos", v => f0.format(v), 1] };
+  const st = { x: "cuota_coop_depositos", y: "crec_depositos", region: "", provincia: "", minimo: 0, clusters: new Set(CP.map(d => d.cluster)) };
+  const barra = barraFiltros(sec);
+  filtro(barra, "Eje X", desplegable(Object.entries(VARS).map(([k, v]) => [k, v[0]]), st.x, v => { st.x = v; pintar(); }));
+  filtro(barra, "Eje Y", desplegable(Object.entries(VARS).map(([k, v]) => [k, v[0]]), st.y, v => { st.y = v; pintar(); }));
+  const provs = () => [["", "Todas"], ...unicos(CA.filter(d => !st.region || d.region === st.region).map(d => d.provincia)).sort().map(x => [x, titulo(x)])];
+  const selP = desplegable(provs(), "", v => { st.provincia = v; pintar(); pintarO(); });
+  filtro(barra, "Región", desplegable(REGIONES, "", v => { st.region = v; st.provincia = ""; selP.cargar(provs(), ""); pintar(); pintarO(); }));
+  filtro(barra, "Provincia", selP);
+  filtro(barra, "Depósitos mínimos", segmentado([["0", "Todos"], ["1e8", "≥ USD 100 M"], ["5e8", "≥ USD 500 M"]], "0", v => { st.minimo = +v; pintar(); }));
+  filtro(barra, "Tipos de mercado", chipsFijos(CP.map(d => [d.cluster, d.cluster + ". " + NOMBRE_CLUS(d.cluster)]), st.clusters, colorCluster, () => pintar()));
+  const sc = tarjeta(sec, "", "Tamaño del círculo = depósitos del cantón; se rotulan los 4 más grandes del filtro. Pasa el cursor para ver el detalle.", "Fuente: CAPCOL + SEPS (saldos y crecimiento a 36 meses); tasas locales BCE. Solo cantones con ≥ USD 20 M en depósitos (≈ 99 % del total).");
+  const envT = tablaEn(bloque(sec, "Detalle"), "Cantones del filtro", "Ordena con clic en los encabezados.");
+  const envP = tablaEn(bloque(sec, "Tipos de mercado"), "", `K-means; medianas por grupo salvo depósitos (suma). Silueta ${f2.format(R.clusters_canton.silueta.find(d => d.k === CP.length)?.silueta ?? 0)}: segmentación práctica. Las etiquetas son una lectura del perfil.`);
+  tabla(envP, [{ key: "cluster", label: "Tipo", fmt: v => v + ". " + NOMBRE_CLUS(v) }, { key: "cantones", label: "Cantones", n: true }, { key: "depositos", label: "Depósitos", n: true, fmt: usd }, { key: "crec_depositos", label: "Crec. dep.", n: true, fmt: v => pct(v) }, { key: "cartera_depositos", label: "Cartera/dep.", n: true, fmt: v => f2.format(v) },
+    { key: "cuota_coop", label: "Cuota coop.", n: true, fmt: v => pct(v, 0) }, { key: "peso_micro", label: "Peso micro", n: true, fmt: v => pct(v, 0) }, { key: "bancos", label: "Bancos", n: true, fmt: v => f0.format(v) }, { key: "spread_coop_banco", label: "Coop − banco", n: true, fmt: v => pp(v) }, { key: "ejemplos", label: "Ejemplos", fmt: titulo }], CP);
+  const filtrados = () => CA.filter(d => (!st.region || d.region === st.region) && (!st.provincia || d.provincia === st.provincia) && d.depositos >= st.minimo && st.clusters.has(d.cluster));
+  function pintar() {
+    const f = filtrados(), [nx, fx, kx] = VARS[st.x], [ny, fy, ky] = VARS[st.y];
+    sc.h.textContent = `${ny} vs. ${nx}`;
+    leyenda(sc.ley, CP.filter(d => st.clusters.has(d.cluster)).map(d => ({ name: d.cluster + ". " + NOMBRE_CLUS(d.cluster), color: colorCluster(d.cluster) })), "punto");
+    const top = new Set([...f].sort((a, b) => b.depositos - a.depositos).slice(0, 4).map(d => d.canton));
+    dispersion(sc.g, f.map(d => ({ x: d[st.x] * kx, y: d[st.y] * ky, size: d.depositos, color: colorCluster(d.cluster), label: titulo(d.canton), foco: top.has(d.canton),
+      tip: [{ name: "provincia", value: titulo(d.provincia) }, { name: "depósitos", value: usd(d.depositos) }, { name: nx, value: fx(d[st.x]) }, { name: ny, value: fy(d[st.y]) }, { name: "tipo de mercado", value: d.cluster + ". " + NOMBRE_CLUS(d.cluster) }] })),
+      { tamano: true, etqX: nx, etqY: ny, fmtX: v => f1.format(v), fmtY: v => f1.format(v), alto: 420 });
+    tabla(envT, [{ key: "canton", label: "Cantón", fmt: titulo }, { key: "provincia", label: "Provincia", fmt: titulo }, { key: "cluster", label: "Tipo", n: true }, { key: "depositos", label: "Depósitos", n: true, fmt: usd }, { key: "crec_depositos", label: "Crec. dep.", n: true, fmt: v => pct(v) },
+      { key: "cartera_depositos", label: "Cartera/dep.", n: true, fmt: v => f2.format(v) }, { key: "cuota_coop_depositos", label: "Cuota coop.", n: true, fmt: v => pct(v, 0) }, { key: "avance_coop_depositos_pp", label: "Avance coop.", n: true, fmt: v => pp(v), clase: v => v > 0 ? "neg" : "pos" },
+      { key: "hhi_depositos", label: "HHI", n: true, fmt: v => f0.format(v) }, { key: "morosidad", label: "Mora", n: true, fmt: v => pct(v) }, { key: "spread_coop_banco", label: "Coop − banco", n: true, fmt: v => pp(v) }], f, { ordenable: true, orden: "depositos", dir: -1 });
+  }
+  const bo = bloque(sec, "Oportunidades de una entidad"), barraO = barraFiltros(bo);
+  const stO = { e: ENT in X.oportunidades ? ENT : Object.keys(X.oportunidades)[0], m: "depositos" };
+  filtro(barraO, "Entidad", desplegable(Object.keys(X.oportunidades).map(k => [k, nom(k)]), stO.e, v => { stO.e = v; pintarO(); }));
+  filtro(barraO, "Medida", segmentado([["depositos", "Depósitos"], ["cartera", "Cartera"]], stO.m, v => { stO.m = v; pintarO(); }));
+  const outO = el("div"); bo.append(outO);
+  const ro = el("div", { class: "rejilla gt" }); ro.style.marginTop = "16px"; bo.append(ro);
+  const go = tarjeta(ro, "", "Color fuerte: ya tiene presencia. Gris: no tiene saldo allí.", "Potencial = (cuota objetivo − cuota actual) × mercado. Cuota objetivo: percentil 75 de sus cuotas en cantones del mismo tipo de mercado y región. Respeta los filtros de región y provincia de arriba.");
+  const envO = tablaEn(ro, "Detalle", "Ordena con clic en los encabezados.");
+  function pintarO() {
+    const O = filas(X.oportunidades[stO.e][stO.m]).filter(d => (!st.region || d.region === st.region) && (!st.provincia || d.provincia === st.provincia));
+    const pres = O.filter(d => d.presente), aus = O.filter(d => !d.presente), totM = O.reduce((s, d) => s + d.mercado, 0);
+    datos(outO, [["Potencial del filtro", usd(O.reduce((s, d) => s + (d.potencial_usd || 0), 0)), `${nom(stO.e)} · ${stO.m === "depositos" ? "depósitos" : "cartera"}`], ["Donde ya está", usd(pres.reduce((s, d) => s + d.potencial_usd, 0)), `${pres.filter(d => d.brecha_pp > 0).length} cantones con brecha`], ["Donde no está", usd(aus.reduce((s, d) => s + d.potencial_usd, 0)), `${aus.length} cantones`], ["Cuota en el filtro", pct(totM ? O.reduce((s, d) => s + d.cuota * d.mercado, 0) / totM : null), "ponderada por tamaño"]]);
+    go.h.textContent = `Mayor potencial · ${nom(stO.e)} (millones de USD)`;
+    barras(go.g, [...O].sort((a, b) => b.potencial_usd - a.potencial_usd).slice(0, 15).filter(d => d.potencial_usd > 0).map(d => ({ label: titulo(d.canton), value: d.potencial_usd / 1e6, color: d.presente ? (stO.e === ENT ? css("--s-foco") : css("--s-bancos")) : css("--s-neutro"),
+      tip: [{ name: "potencial", value: usd(d.potencial_usd) }, { name: "cuota actual", value: pct(d.cuota) }, { name: "cuota objetivo", value: pct(d.cuota_objetivo) }, { name: "región · tipo", value: titulo(d.region) + " · " + d.cluster }] })), { fmt: v => f0.format(v) + " M", izq: 110 });
+    tabla(envO, [{ key: "canton", label: "Cantón", fmt: titulo }, { key: "region", label: "Región", fmt: titulo }, { key: "mercado", label: "Mercado", n: true, fmt: usd }, { key: "cuota", label: "Cuota", n: true, fmt: v => pct(v) }, { key: "cuota_objetivo", label: "Cuota objetivo", n: true, fmt: v => pct(v) }, { key: "brecha_pp", label: "Brecha", n: true, fmt: v => pp(v) }, { key: "potencial_usd", label: "Potencial", n: true, fmt: usd }], O, { ordenable: true, orden: "potencial_usd", dir: -1 });
+  }
+  pintar(); pintarO();
+};
+
+/* ---------- 09 Modelos de negocio ---------- */
+RENDER.segmentos = sec => {
+  const PE = R.clusters_entidad.perfil, pares = Object.keys(acc.pares || {});
+  cabecera(sec, pag("segmentos"), [`El clustering por estructura de balance separa ${PE.length} modelos de negocio: la banca universal (cartera productiva, fondeo barato, morosidad baja) frente al bloque minorista de consumo y microcrédito donde conviven cooperativas S1 y bancos medianos. Los pares más cercanos de ${ent} son `, [pares.slice(0, 4).map(nom).join(", ")], ". Cambia los ejes y sigue la trayectoria de cada entidad."]);
+  const VARS = { log_activo: ["Tamaño (log activo)", v => f1.format(v), 1], cartera_activo: ["Cartera / activo", v => pct(v, 0), 100], depositos_pasivo: ["Depósitos / pasivo", v => pct(v, 0), 100], peso_plazo: ["Peso de depósitos a plazo", v => pct(v, 0), 100],
+    peso_consumo: ["Peso consumo", v => pct(v, 0), 100], peso_micro: ["Peso microcrédito", v => pct(v, 0), 100], peso_productivo: ["Peso productivo", v => pct(v, 0), 100], liquidez_activo: ["Fondos disponibles / activo", v => pct(v, 0), 100],
+    roa: ["ROA", v => pct(v, 2), 100], roe: ["ROE", v => pct(v, 1), 100], morosidad: ["Morosidad", v => pct(v, 1), 100], costo_fondeo: ["Costo de fondeo", v => pct(v, 1), 100], gasto_operativo_activo: ["Gasto operativo / activo", v => pct(v, 1), 100],
+    patrimonio_activo: ["Solvencia (patrimonio / activo)", v => pct(v, 1), 100], crec_cartera_12m: ["Crecimiento cartera 12 m", v => pct(v, 0), 100], crec_depositos_12m: ["Crecimiento depósitos 12 m", v => pct(v, 0), 100] };
+  const st = { x: "morosidad", y: "roa", tipos: new Set(["BANCO PRIVADO", "COOPERATIVA", "MUTUALISTA"]), e: ENT };
+  const barra = barraFiltros(sec);
+  filtro(barra, "Eje X", desplegable(Object.entries(VARS).map(([k, v]) => [k, v[0]]), st.x, v => { st.x = v; pintar(); }));
+  filtro(barra, "Eje Y", desplegable(Object.entries(VARS).map(([k, v]) => [k, v[0]]), st.y, v => { st.y = v; pintar(); }));
+  filtro(barra, "Tipos", chipsFijos([["BANCO PRIVADO", "Bancos privados"], ["COOPERATIVA", "Cooperativas S1"], ["MUTUALISTA", "Mutualistas"]], st.tipos, t => css(COLOR_TIPO[t]), () => pintar()));
+  filtro(barra, "Destacar", desplegable(ENTS().map(d => [d.entidad_codigo, nom(d.entidad_codigo)]).sort((a, b) => a[1].localeCompare(b[1])), st.e, v => { st.e = v; pintar(); }));
+  const sc = tarjeta(sec, "", `Color = modelo de negocio; tamaño = activo. Resaltada la entidad elegida (con ${ent}, también sus pares más cercanos).`, "Bancos privados, cooperativas segmento 1 y mutualistas con activo ≥ USD 100 M, corte " + amTxt(ultimoAM) + ".");
+  const envP = tablaEn(bloque(sec, "Modelos de negocio"), "", `Ward + K-means sobre variables de estructura; el desempeño no entra al clustering. Silueta ${f2.format(Math.max(...R.clusters_entidad.silueta.map(d => d.silueta)))}.`);
+  tabla(envP, [{ key: "cluster", label: "Grupo", fmt: v => v + ". " + NOMBRE_SEG(v) }, { key: "entidades", label: "Entidades", n: true }, { key: "activo_total", label: "Activo", n: true, fmt: usd }, { key: "peso_productivo", label: "Productivo", n: true, fmt: v => pct(v, 0) }, { key: "peso_consumo", label: "Consumo", n: true, fmt: v => pct(v, 0) },
+    { key: "peso_micro", label: "Micro", n: true, fmt: v => pct(v, 0) }, { key: "peso_plazo", label: "Dep. a plazo", n: true, fmt: v => pct(v, 0) }, { key: "roa", label: "ROA", n: true, fmt: v => pct(v, 2) }, { key: "morosidad", label: "Morosidad", n: true, fmt: v => pct(v, 1) }, { key: "costo_fondeo", label: "Costo fondeo", n: true, fmt: v => pct(v, 1) }, { key: "miembros", label: "Principales" }], PE);
+  const bt = bloque(sec, "Trayectoria de los indicadores"), barraT = barraFiltros(bt);
+  const IND = [["morosidad", "Mora"], ["liquidez", "Liquidez"], ["solvencia", "Solvencia"], ["roa", "ROA"], ["roe", "ROE"], ["costo_fondeo", "Costo de fondeo"]];
+  const stT = { ind: "morosidad", mediana: "1" }, selT = new Set([ENT, ...pares.slice(0, 3)].filter(k => ENTS().some(d => d.entidad_codigo === k))), palT = new Paleta();
+  filtro(barraT, "Indicador", segmentado(IND, stT.ind, v => { stT.ind = v; pintarT(); }));
+  filtro(barraT, "Mediana de su grupo", segmentado([["1", "Mostrar"], ["0", "Ocultar"]], stT.mediana, v => { stT.mediana = v; pintarT(); }));
+  const opT = ENTS().map(d => [d.entidad_codigo, nom(d.entidad_codigo)]).sort((a, b) => (a[0] === ENT ? -1 : b[0] === ENT ? 1 : 0) || a[1].localeCompare(b[1]));
+  const wrapT = el("div"); filtro(barraT, "Entidades (hasta 6) · busca para ver más", wrapT);
+  const busc = el("input", { type: "search", class: "buscador", placeholder: "Buscar entidad…", "aria-label": "Buscar entidad" }); busc.style.cssText = "margin:0 0 6px;max-width:240px";
+  const chipsT = el("div");
+  wrapT.append(busc, chipsT);
+  const armar = () => { const q = busc.value.trim().toLowerCase(); chipsT.replaceChildren(chipsSel(opT.filter(([k, t]) => selT.has(k) || (q ? t.toLowerCase().includes(q) : opT.findIndex(o => o[0] === k) < 14)), selT, palT, () => pintarT())); };
+  busc.addEventListener("input", armar);
+  const gt = tarjeta(bt, "", "", "Ratios mensuales de balance (Boletín Superbancos y EEFF SEPS). Mediana: entidades del mismo modelo de negocio que la primera seleccionada.");
+  function pintar() {
+    const [nx, fx, kx] = VARS[st.x], [ny, fy, ky] = VARS[st.y], resalta = new Set([st.e, ...(st.e === ENT ? pares.slice(0, 4) : [])]);
+    sc.h.textContent = `${ny} vs. ${nx}`;
+    leyenda(sc.ley, PE.map(d => ({ name: d.cluster + ". " + NOMBRE_SEG(d.cluster), color: colorCluster(d.cluster) })), "punto");
+    dispersion(sc.g, ENTS().filter(d => st.tipos.has(d.tipo_entidad)).map(d => ({ x: d[st.x] * kx, y: d[st.y] * ky, size: d.activo, color: colorCluster(d.cluster), label: nom(d.entidad_codigo), foco: resalta.has(d.entidad_codigo),
+      tip: [{ name: "tipo", value: nom(d.tipo_entidad) }, { name: "activo", value: usd(d.activo) }, { name: nx, value: fx(d[st.x]) }, { name: ny, value: fy(d[st.y]) }, { name: "modelo", value: d.cluster + ". " + NOMBRE_SEG(d.cluster) }] })),
+      { tamano: true, etqX: nx, etqY: ny, fmtX: v => f1.format(v), fmtY: v => f1.format(v), alto: 420 });
+  }
+  function pintarT() {
+    const series = [...selT].map(k => ({ name: nom(k), color: palT.color(k), data: TRAY().filter(d => d.entidad_codigo === k).map(d => [amFecha(d.anio_mes), d[stT.ind] == null ? null : d[stT.ind] * 100]) }));
+    if (stT.mediana === "1" && selT.size) {
+      const cl = ENTS().find(d => d.entidad_codigo === [...selT][0])?.cluster, miembros = new Set(ENTS().filter(d => d.cluster === cl).map(d => d.entidad_codigo)), porMes = {};
+      for (const d of TRAY()) if (miembros.has(d.entidad_codigo)) (porMes[d.anio_mes] ||= []).push(d[stT.ind]);
+      series.push({ name: `Mediana grupo ${cl}`, color: css("--ink-2"), discontinua: true, grosor: 1.5, sinPunto: true, data: Object.keys(porMes).map(Number).sort((a, b) => a - b).map(am => [amFecha(am), mediana(porMes[am]) * 100]) });
+    }
+    gt.h.textContent = IND.find(i => i[0] === stT.ind)[1] + " (%)";
+    leyenda(gt.ley, series); lineas(gt.g, series, { fmtY: v => f1.format(v) + " %", fmtT: v => f2.format(v) + " %", etiquetas: true, alto: 300 });
+  }
+  pintar(); armar(); pintarT();
+};
+
+/* ---------- 10 Plan de acción ---------- */
+RENDER.accion = sec => {
+  const vp = acc.vs_pares || [], yo = vp.find(d => d.entidad_codigo === ENT) || {}, otros = vp.filter(d => d.entidad_codigo !== ENT), med = k => mediana(otros.map(d => d[k]));
+  cabecera(sec, pag("accion"), [`${ent} es el segundo banco del país, con el `, ["mejor ROA de su grupo de pares"], " y crecimiento de cartera por encima de ellos. Su espacio de crecimiento está menos en precio y más en geografía, en la calidad de su cartera y en cómo y cuándo mueve sus tasas."]);
+  const k = el("div"); sec.append(k);
+  datos(k, [["ROA", pct(yo.roa, 2), "pares: " + pct(med("roa"), 2)], ["Morosidad", pct(yo.morosidad, 1), "pares: " + pct(med("morosidad"), 1)], ["Costo de fondeo", pct(yo.costo_fondeo, 1), "pares: " + pct(med("costo_fondeo"), 1)], ["Crecimiento cartera 12 m", pct(yo.crec_cartera_12m, 0), "pares: " + pct(med("crec_cartera_12m"), 0)]]);
+  const sim25 = acc.simulacion.escenarios["25"], ceE = R.correccion_error.find(d => d.grupo === ENT), PR = R.anticipacion.prediccion, predE = PR.find(x => x.banco === ENT);
+  const sh = senalHoy();
+  const losiguen = Object.entries(acc.lo_siguen || {}).filter(([c]) => !c.startsWith("COOP")).sort((a, b) => b[1] - a[1]);
+  const opD = acc.oportunidades.depositos.top, opC = acc.oportunidades.cartera.top;
+  const costaF = opD.filter(d => d.region === "COSTA" && d.presente && d.brecha_pp >= 2).slice(0, 4), sierra = opD.filter(d => d.region === "SIERRA" && d.presente).slice(0, 4).map(d => titulo(d.canton)), ausente = opC.filter(d => !d.presente).slice(0, 5).map(d => titulo(d.canton));
+  const recos = [
+    ["1. No subir la tasa de forma general: pagar por dinero nuevo, no por el que ya está.", `Con su elasticidad (α ${f3.format(acc.simulacion.alpha)}), +0,25 pp de tasa en todo el país atraen ≈ ${usd(sim25.gana_mensual_usd)} al mes y suman ≈ ${usd(sim25.saldo_adicional_usd)} de saldo, pero re-precian ${usd(acc.simulacion.saldo_plazo_actual)}: el fondeo incremental cuesta ≈ ${f0.format(sim25.costo_marginal_pct)} % anual. Una tasa preferencial solo para dinero nuevo cuesta ≈ ${f1.format(acc.simulacion.tasa_actual + 0.25)} %.`, "#/simulador?e=" + ENT, "Probar en el simulador"],
+    ["2. Defender cuota en la Costa, donde rinde por debajo de su propia marca.", `${costaF.map(d => titulo(d.canton)).join(", ")}: su cuota de depósitos está entre ${pct(Math.min(...costaF.map(d => d.cuota)), 0)} y ${pct(Math.max(...costaF.map(d => d.cuota)), 0)} frente a ≈ ${pct(costaF[0]?.cuota_objetivo, 0)} en plazas costeñas parecidas. Prioridad comercial y de cobertura (agencias, corresponsales, banca digital).`, "#/cantones", "Ver cantones"],
+    ["3. Sierra media y cantones sin presencia en crédito.", `En ${sierra.join(", ")} la brecha es de 2–4 pp. En cartera, cantones donde no coloca y sus pares sí: ${ausente.join(", ")}.`, "#/cantones", "Ver oportunidades"],
+    ["4. Moverse con el ciclo, no contra él: vigilar a los líderes.", `${ent} ajusta rápido a sus pares (vida media ${f1.format(ceE.vida_media)} meses). Cuando mueve primero, ${losiguen.slice(0, 3).map(([c, v]) => nom(c) + " " + pct(v, 0)).join(", ")} lo acompañan. Hoy domina la señal de ${sh.sustantivo}: mayor probabilidad para ${sh.texto}; ${ent} tiene ${pct(predE?.[sh.k], 0)}. ${sh.dir === "baja" ? "Si ellos recortan, sostener la tasa unas semanas capta el flujo que se mueve." : "Si el mercado sube detrás del líder, decidir rápido si acompañar: quedarse atrás cuesta flujo nuevo, y subir con premio solo para dinero nuevo limita el costo."}`, "#/anticipar", "Ver anticipación"],
+    ["5. La calidad de cartera es parte del precio del fondeo.", `Mora de ${pct(yo.morosidad, 1)} contra ${pct(med("morosidad"), 1)} de sus pares. Cada punto de mora equivale a ≈ ${f2.format(acc.mora_equivalente_pp)} pp de tasa en la captación; un deterioro de 1 pp costaría ≈ ${usd(acc.simulacion.flujo_mensual_base * -d1disc.coeficientes.morosidad_bancos)} al mes de captación nueva.`, "#/demanda", "Ver disciplina de mercado"],
+    ["6. Vigilar el diferencial con las cooperativas S1.", `Hoy pagan ≈ ${f1.format(ultTasa["COOP SEGMENTO 1"] - ultTasa[ENT])} pp más que ${ent}. Cada punto adicional lleva ≈ ${f1.format(sust.flujos.pp_cuota_por_pp_spread)} pp de los flujos a plazo hacia ellas. En mercados cooperativos, producto de ahorro o plazo con tasa competitiva solo para dinero nuevo.`, "#/sustitucion", "Mover el diferencial"],
+  ];
+  const ac = el("div", { class: "accion" }); ac.style.marginTop = "16px";
+  for (const [t, d, h, l] of recos) { const a = el("article"); a.append(el("h3", {}, t), el("p", {}, d), el("a", { href: h, class: "boton" }, l + " →")); ac.append(a); }
+  sec.append(ac);
+  const envP = tablaEn(bloque(sec, "Comparación"), "Frente a sus pares más cercanos", "Pares por distancia en variables de modelo de negocio. Ordena con clic.");
+  tabla(envP, [{ key: "entidad_codigo", label: "Entidad", fmt: nom }, { key: "roa", label: "ROA", n: true, fmt: v => pct(v, 2) }, { key: "roe", label: "ROE", n: true, fmt: v => pct(v, 1) }, { key: "morosidad", label: "Morosidad", n: true, fmt: v => pct(v, 1) }, { key: "gasto_operativo_activo", label: "Gasto op./activo", n: true, fmt: v => pct(v, 1) },
+    { key: "costo_fondeo", label: "Costo fondeo", n: true, fmt: v => pct(v, 1) }, { key: "crec_cartera_12m", label: "Crec. 12 m", n: true, fmt: v => pct(v, 0) }, { key: "crec_depositos_12m", label: "Crec. dep. 12 m", n: true, fmt: v => pct(v, 0) }], [yo, ...otros], { ordenable: true, foco: f => f.entidad_codigo === ENT });
+};
+
+/* ---------- 11 Método ---------- */
+RENDER.metodo = sec => {
+  cabecera(sec, pag("metodo"), ["Qué datos se usan, cómo se construye cada modelo y qué puede fallar. Método completo y referencias en docs/analisis_mercado.md del repo."]);
+  const conc = R.conciliacion.map(c => `${nom(c.tipo_entidad)} ${c.medida} ${pct(c.diferencia_agregada_pct / 100, 1)}`).join(" · ");
+  const bloques = [
+    ["Datos y reglas de lectura", [`Saldos por cantón: CAPCOL (Superbancos) y SEPS, enero 2021 – ${amTxt(R.cortes.saldos)}. Excluye entidades de segundo piso. Los depósitos se registran en el cantón de la agencia: Quito y Guayaquil concentran depósitos corporativos.`, "Flujos y tasas: BCE semanal, tasas ponderadas por monto. Los totales nacionales incluyen operaciones sin cantón; los modelos por cantón las excluyen.", "Balances: Boletín Superbancos y EEFF SEPS. ROA = utilidad anualizada / activo promedio del año; morosidad = cartera improductiva / cartera bruta.", `Conciliación del corte (saldos por cantón vs. balance): ${conc}.`]],
+    ["Qué puede fallar en cada modelo", ["Sustitución agregada: forma reducida; el diferencial sube cuando los bancos necesitan liquidez, así que mezcla la respuesta del ahorrista con el ciclo.", "Demanda por cantón: el instrumento supone que los shocks locales no son nacionales. Los flujos incluyen renovaciones: la elasticidad de clientes nuevos es probablemente mayor. σ ≈ 0, por eso el simulador usa logit simple.", "Simulador: usa el promedio de 6 meses por cantón; las cifras pueden diferir levemente de las del plan de acción, que simula mes a mes.", "Balance: rezagado 1 mes por publicación (robustez 3); banca pública y cooperativas S4–S5 sin balance. Solvencia = patrimonio / activo; su coeficiente negativo es mecánica contable.", "Liderazgo: precedencia temporal, no causalidad.", "Anticipación: AUC ≈ 0,7–0,76; sin variables externas (tasas de EE. UU., riesgo país).", "Oportunidades: brecha frente al propio desempeño en mercados parecidos; no usan población ni costos de expansión.", "Clusters: los cantones forman un continuo (silueta ≈ 0,25)."]],
+  ];
+  for (const [t, items] of bloques) { const d = el("details", { open: "" }), ul = el("ul"); d.append(el("summary", {}, t)); for (const i of items) ul.append(el("li", {}, i)); d.append(ul); sec.append(d); }
+  const REFS = [["Berry, S. (1994).", "Estimating discrete-choice models of product differentiation.", "RAND Journal of Economics, 25(2)."], ["Berry, S., Levinsohn, J. y Pakes, A. (1995).", "Automobile prices in market equilibrium.", "Econometrica, 63(4)."], ["Nevo, A. (2001).", "Measuring market power in the ready-to-eat cereal industry.", "Econometrica, 69(2)."],
+    ["Dick, A. (2008).", "Demand estimation and consumer welfare in the banking industry.", "Journal of Banking & Finance, 32(8)."], ["Adams, R., Brevoort, K. y Kiser, E. (2007).", "Who competes with whom? The case of depository institutions.", "Journal of Industrial Economics, 55(1)."], ["Hannan, T. (2003).", "The impact of credit unions on the rates offered for retail deposits by banks and thrift institutions.", "Federal Reserve, FEDS 2003-06."],
+    ["Egan, M., Hortaçsu, A. y Matvos, G. (2017).", "Deposit competition and financial fragility.", "American Economic Review, 107(1)."], ["Drechsler, I., Savov, A. y Schnabl, P. (2017).", "The deposits channel of monetary policy.", "Quarterly Journal of Economics, 132(4)."], ["De Graeve, F., De Jonghe, O. y Vander Vennet, R. (2007).", "Competition, transmission and bank pricing policies.", "Journal of Banking & Finance, 31(1)."],
+    ["Gambacorta, L. (2008).", "How do banks set interest rates?", "European Economic Review, 52(5)."], ["Hannan, T. y Berger, A. (1991).", "The rigidity of prices: evidence from the banking industry.", "American Economic Review, 81(4)."], ["Martínez Pería, M. S. y Schmukler, S. (2001).", "Do depositors punish banks for bad behavior?", "Journal of Finance, 56(3)."],
+    ["Roengpitya, R., Tarashev, N. y Tsatsaronis, K. (2014).", "Bank business models.", "BIS Quarterly Review, diciembre."], ["Amel, D. y Rhoades, S. (1988).", "Strategic groups in banking.", "Review of Economics and Statistics, 70(4)."], ["Nguyen, H.-L. Q. (2019).", "Are credit markets still local?", "AEJ: Applied Economics, 11(1)."],
+    ["Klein, M. (1971).", "A theory of the banking firm.", "Journal of Money, Credit and Banking, 3(2)."], ["Maimbo, S. y Henriquez Gallegos, C. (2014).", "Interest rate caps around the world.", "World Bank Policy Research WP 7070."]];
+  const d = el("details"), ol = el("ol", { class: "refs" }); d.append(el("summary", {}, "Referencias académicas"));
+  for (const [a, t, j] of REFS) { const li = el("li"); li.append(document.createTextNode(a + " "), el("i", {}, t), document.createTextNode(" " + j)); ol.append(li); }
+  d.append(ol); sec.append(d);
+  sec.append(el("p", { class: "pie" }, "Generado por scripts/analisis_mercado.py + scripts/informe_mercado.py (repo benchmark-bancos-analisis) sobre el data mart marts.*. Datos embebidos; no requiere conexión."));
+};
+
+/* ---------- 12 Glosario ---------- */
+RENDER.glosario = sec => {
+  cabecera(sec, pag("glosario"), ["Qué es cada término, unidad e indicador y cómo se lee. Fuente: docs/glosario_analisis.md."]);
+  const inp = el("input", { class: "buscador", type: "search", placeholder: "Buscar término (p. ej. AUC, mora, pp)", "aria-label": "Buscar en el glosario" }), cuerpo = el("div"); sec.append(inp, cuerpo);
+  const pintar = f => { f = f.trim().toLowerCase(); cuerpo.replaceChildren(); for (const g of GLOS) { const fl = g.terminos.filter(t => !f || (t.termino + " " + t.que_es + " " + t.como_se_lee).toLowerCase().includes(f)); if (!fl.length) continue; const b = el("div", { class: "glosario-grupo tarjeta" }), env = el("div", { class: "tabla-env" }); b.append(el("h3", {}, g.grupo), env); tabla(env, [{ key: "termino", label: "Término" }, { key: "que_es", label: "Qué es" }, { key: "como_se_lee", label: "Cómo se lee" }], fl); cuerpo.append(b); } if (!cuerpo.children.length) cuerpo.append(el("p", { class: "respuesta" }, "Ningún término coincide con la búsqueda.")); };
+  inp.addEventListener("input", () => pintar(inp.value)); pintar("");
+};
+
+/* ================= Navegación ================= */
+const contenido = $("contenido"), nav = $("capitulos");
+for (const p of PAGINAS) {
+  const li = el("li"), a = el("a", { href: "#/" + p.id }); a.append(el("span", { class: "n" }, p.n), document.createTextNode(p.t)); li.append(a); nav.append(li);
+  const s = el("section", { class: "pagina", id: "p-" + p.id }); s.hidden = true; contenido.append(s);
+}
+for (const [k, v] of [["Saldos", amTxt(R.cortes.saldos)], ["Tasas BCE", fechaTxt(R.cortes.tasas_semana)], ["Balances", amTxt(R.cortes.balance)]]) { const d = el("div"); d.append(document.createTextNode(k + ": "), el("b", {}, v)); $("cortes").append(d); }
+function ir() {
+  const id = location.hash.replace(/^#\//, "").split("?")[0] || "inicio", p = pag(id) || PAGINAS[0];
+  for (const x of PAGINAS) $("p-" + x.id).hidden = x.id !== p.id;
+  nav.querySelectorAll("a").forEach(a => a.getAttribute("href") === "#/" + p.id ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  const s = $("p-" + p.id);
+  if (!pintada[p.id] || p.id === "simulador") {
+    s.replaceChildren();
+    try { RENDER[p.id](s); if (p.id !== "inicio") pie(s, p); } catch (e) { s.append(el("p", { class: "respuesta" }, "No se pudo dibujar esta página: " + e.message)); console.error(e); }
+    pintada[p.id] = true;
+  } else s.querySelectorAll(".grafico").forEach(g => g._redibujar && g._redibujar());
+  document.title = (p.id === "inicio" ? "" : p.t + " · ") + "Mercado de depósitos y crédito";
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", ir);
+ir();
+</script>
+</body>
+</html>

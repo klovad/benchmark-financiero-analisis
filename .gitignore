@@ -1,0 +1,15 @@
+# Credenciales
+.env
+
+# Entorno
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+
+# Extracciones y salidas pesadas (se regeneran desde la base)
+data/
+salidas/
+
